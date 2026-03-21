@@ -1,0 +1,1176 @@
+openapi: 3.1.0
+info:
+  title: DnD Backend
+  description: DnD Backend
+  version: 1.0.0
+servers:
+  - url: 'todo'
+components:
+  securitySchemes:
+    JwtBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
+  schemas:
+    UserStructure:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "johndoe123"
+        password:
+          type: string
+          example: "****"
+    RegisteredUserStructure:
+      type: object
+      properties:
+        ID:
+          type: integer
+          example: 1
+        CreatedAt:
+          type: string
+          example: "2026-03-20T14:36:33.123445+03:00"
+        UpdatedAt:
+          type: string
+          example: "2026-03-20T14:36:33.123445+03:00"
+        DeletedAt:
+          type: string
+          example: null
+        username:
+          type: string
+          example: "johndoe123"
+        password:
+          type: string
+          example: ""
+        token:
+          type: string
+    SpellObject:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Mage Hand
+        school:
+          type: string
+          example: Conjuration
+        level:
+          type: integer
+          format: uint
+          example: 0
+        components:
+          type: object
+          properties:
+            verbal:
+              type: boolean
+            somatic:
+              type: boolean
+            material:
+              type: object
+              properties:
+                status:
+                  type: boolean
+                components:
+                  type: string
+        time_to_cast:
+          type: object
+          properties:
+            amount:
+              type: integer
+              format: uint
+              example: 1
+            time:
+              type: string
+              enum:
+                - Action
+                - Bonus Action
+                - Reaction
+                - Rounds
+            notes:
+              type: string
+        target:
+          type: object
+          properties:
+            target_type:
+              type: string
+              example: Circle
+            size:
+              type: integer
+              format: uint
+        range:
+          type: object
+          properties:
+            range_type:
+              type: string
+              enum:
+                - Touch
+                - Self
+                - Miles
+                - Feet
+                - Any
+            amount:
+              type: integer
+            notes:
+              type: string
+        duration:
+          type: object
+          properties:
+            duration_type:
+              type: string
+              enum:
+                - Instant
+                - Days
+                - Minutes
+                - Hours
+                - Until dispelled
+            duration:
+              type: integer
+        effect:
+          type: object
+          properties:
+            effect:
+              type: string
+              enum:
+                - Melee
+                - Ranged
+                - Heal
+                - Save
+                - Other
+            ability:
+              type: string
+              enum:
+                - STR
+                - DEX
+                - CON
+                - INT
+                - WIS
+                - CHA
+            dmg_type:
+              type: string
+            dice:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  format: uint
+                  example: 1
+                value:
+                  type: integer
+                  enum:
+                    - 4
+                    - 8
+                    - 10
+                    - 12
+                    - 20
+                    - 100
+                bonus:
+                  type: integer
+                  format: uint
+                  example: 1
+        upcast:
+          type: object
+          properties:
+            upcast_type:
+              type: string
+              enum:
+                - Level
+                - Cantrip
+            dice:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  format: uint
+                  example: 1
+                value:
+                  type: integer
+                  enum:
+                    - 4
+                    - 8
+                    - 10
+                    - 12
+                    - 20
+                    - 100
+        concentration:
+          type: boolean
+        ritual:
+          type: boolean
+        description:
+          type: string
+    FeatObject:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Alert"
+        prerequisites:
+          type: string
+          example: "Must have DEX of 13 or higher"
+        benefits:
+          type: string
+    ItemObject:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Torch"
+        item_type:
+          type: string
+          enum:
+            - Weapon
+            - Armour
+            - Artefact
+            - Container
+            - Other
+        cost:
+          type: integer
+          format: uint
+          example: 1
+        weight:
+          type: number
+          format: ufloat
+          example: 1.5
+        data:
+          type: object
+    CharacterObject:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Thorin Ironforge"
+        picture:
+          type: string # url-encoded
+        race:
+          type: string #enum?
+          example: "Half-Elf"
+        xp:
+          type: integer
+          format: uint
+          example: 300
+        level:
+          type: integer
+          format: uint
+          example: 5
+        class:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Ranger"
+              level:
+                type: integer
+                format: uint
+                example: 5
+              subclass:
+                type: string
+                example: "Gloomstalker"
+        alignment:
+          type: string
+          enum:
+            - LG
+            - NG
+            - CG
+            - LN
+            - TN
+            - CN
+            - LE
+            - NE
+            - CE
+          example: CG
+        background:
+          type: object
+          properties:
+            name:
+              type: string
+              example: "Folk Hero"
+            description:
+              type: string
+        hp:
+          type: object
+          properties:
+            current:
+              type: integer
+              format: uint
+              example: 17
+            max:
+              type: integer
+              format: uint
+              example: 17
+            temp:
+              type: integer
+              format: uint
+              example: 17
+            hit_dice:
+              type: object
+              properties:
+                max:
+                  type: integer
+                  format: uint
+                  example: 3
+                left:
+                  type: integer
+                  format: uint
+                  example: 1
+                value:
+                  type: integer
+                  enum:
+                    - 4
+                    - 8
+                    - 10
+                    - 12
+                    - 20
+        ac:
+          type: integer
+          format: uint
+          example: 15
+        shielded:
+          type: boolean
+        speed:
+          type: integer
+          format: uint
+          example: 30
+        death_saves:
+          type: object
+          properties:
+            success:
+              type: integer
+              format: uint
+              example: 0
+            failure:
+              type: integer
+              format: uint
+              example: 0
+        abilities:
+          type: object
+          properties:
+            str:
+              type: integer
+              format: uint
+              example: 10
+            dex:
+              type: integer
+              format: uint
+              example: 10
+            con:
+              type: integer
+              format: uint
+              example: 10
+            int:
+              type: integer
+              format: uint
+              example: 10
+            wis:
+              type: integer
+              format: uint
+              example: 10
+            cha:
+              type: integer
+              format: uint
+              example: 10
+        initiative_mod:
+          type: integer
+          example: -1
+        conditions:
+          type: array
+          items:
+            type: string
+            example: "Incapacitated"
+        saving_throw_prof:
+          type: array
+          items:
+            type: string
+            enum:
+              - STR
+              - DEX
+              - CON
+              - INT
+              - WIS
+              - CHA
+        defences:
+          type: object
+          properties:
+            resistance:
+              type: array
+              items:
+                type: string
+            immune:
+              type: array
+              items:
+                type: string
+            vulnerable:
+              type: array
+              items:
+                type: string
+            custom:
+              type: array
+              items:
+                type: string
+        proficiency_mod:
+          type: integer
+          format: uint
+          example: 3
+        senses:
+          type: object
+          properties:
+            passive_perception:
+              type: integer
+              format: uint
+              example: 10
+            passive_investigation:
+              type: integer
+              format: uint
+              example: 10
+            passive_insight:
+              type: integer
+              format: uint
+              example: 10
+            other:
+              type: array
+              items:
+                type: string
+                example: "Dark vision 60ft"
+        proficiencies:
+          type: array
+          items:
+            type: string
+            enum:
+              - Acrobatics
+              - Animal Handling
+              - Arcana
+              - Athletics
+              - Deception
+              - History
+              - Insight
+              - Intimidation
+              - Investigation
+              - Medicine
+              - Nature
+              - Perception
+              - Performance
+              - Persuasion
+              - Religion
+              - Sleight of hand
+              - Stealth
+              - Survival
+        expertises:
+          type: array
+          items:
+            type: string
+            enum:
+              - Acrobatics
+              - Animal Handling
+              - Arcana
+              - Athletics
+              - Deception
+              - History
+              - Insight
+              - Intimidation
+              - Investigation
+              - Medicine
+              - Nature
+              - Perception
+              - Performance
+              - Persuasion
+              - Religion
+              - Sleight of hand
+              - Stealth
+              - Survival
+        attacks:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Dagger"
+              to_hit:
+                type: object
+                properties:
+                  ability:
+                    type: string
+                    enum:
+                      - STR
+                      - DEX
+                      - CON
+                      - INT
+                      - WIS
+                      - CHA
+                  bonus:
+                    type: integer
+                    format: uint
+                    example: 5
+              damage:
+                type: object
+                properties:
+                  dice:
+                    type: object
+                    properties:
+                      amount:
+                        type: integer
+                        format: uint
+                        example: 1
+                      value:
+                        type: integer
+                        enum:
+                          - 4
+                          - 8
+                          - 10
+                          - 12
+                          - 20
+                          - 100
+                  bonus:
+                    type: integer
+                    format: uint
+                    example: 5
+              notes:
+                type: array
+                items:
+                  type: string
+                  example: "Finesse"
+        bonus_actions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: Bardic inspiration
+              flavour_text:
+                type: string
+              other_data:
+                type: object
+        spells:
+          type: object
+          properties:
+            current_concentration:
+              $ref: "#/components/schemas/SpellObject"
+            ready_spells:
+              type: array
+              items:
+                $ref: "#/components/schemas/SpellObject"
+            known_spells:
+              type: array
+              items:
+                $ref: "#/components/schemas/SpellObject"
+        armour_proficiency:
+          type: array
+          items:
+            type: string
+            example: "Light Armour"
+        weapon_proficiency:
+          type: array
+          items:
+            type: string
+            example: "Longsword"
+        tools_proficiency:
+          type: array
+          items:
+            type: string
+            example: "Lute"
+        languages:
+          type: array
+          items:
+            type: string
+            example: "Common"
+        class_features:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Ranger"
+              features:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: "Spellcasting"
+                    description:
+                      type: string
+        race_traits:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "Fey Ancestry"
+              description:
+                type: string
+        feats:
+          type: array
+          items:
+            $ref: "#/components/schemas/FeatObject"
+        gender:
+          type: string
+          example: "Male"
+        eyes:
+          type: string
+        size:
+          type: string
+          enum:
+            - Fine
+            - Diminutive
+            - Tiny
+            - Small
+            - Medium
+            - Large
+            - Huge
+            - Gargantuan
+            - Colossal
+        height:
+          type: string
+        faith:
+          type: string
+        hair:
+          type: string
+        skin:
+          type: string
+        age:
+          type: string
+        weight:
+          type: integer
+          format: uint
+          example: 80
+        personality:
+          type: string
+        ideals:
+          type: string
+        bonds:
+          type: string
+        flaws:
+          type: string
+        appearance:
+          type: string
+        organizations:
+          type: string
+        allies:
+          type: string
+        enemies:
+          type: string
+        backstory:
+          type: string
+        notes:
+          type: string
+        money:
+          type: object
+          properties:
+            cp:
+              type: integer
+              format: uint
+              example: 9
+            sp:
+              type: integer
+              format: uint
+              example: 9
+            ep:
+              type: integer
+              format: uint
+              example: 9
+            gp:
+              type: integer
+              format: uint
+              example: 9
+            pp:
+              type: integer
+              format: uint
+              example: 9
+        capacity:
+          type: integer
+          format: uint
+          example: 210
+        inventory:
+          type: array
+          items:
+            $ref: "#/components/schemas/ItemObject"
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+tags:
+  - name: Auth
+    description: Authentication
+  - name: Characters
+    description: CRUD for characters
+  - name: Utils
+    description: Other paths
+paths:
+  /api/new_item:
+    post:
+      description: Create a new item
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [Utils]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ItemObject"
+      responses:
+        200:
+          description: Successfully created an item
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  item:
+                    $ref: "#/components/schemas/ItemObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/get_all_items:
+    get:
+      description: Get all available items in a list
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [ Utils ]
+      responses:
+        200:
+          description: List of items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ItemObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/delete_item:
+    post:
+      description: Delete an item
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [ Utils ]
+      requestBody:
+        description: ID of item to delete
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+      responses:
+        200:
+          description: Successfully deleted the item
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  character:
+                    $ref: "#/components/schemas/ItemObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/new_spell:
+    post:
+      description: Create a new spell
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [Utils]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpellObject"
+      responses:
+        200:
+          description: Successfully created a spell
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  item:
+                    $ref: "#/components/schemas/SpellObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/get_all_spells:
+    get:
+      description: Get all available spells in a list
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [ Utils ]
+      responses:
+        200:
+          description: List of spells
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpellObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/delete_spell:
+    post:
+      description: Delete a spell
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [ Utils ]
+      requestBody:
+        description: ID of spell to delete
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+      responses:
+        200:
+          description: Successfully deleted the spell
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  character:
+                    $ref: "#/components/schemas/SpellObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/list_characters:
+    get:
+      description: List all characters of current user
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [Characters]
+      responses:
+        200:
+          description: Character list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                      example: "Character 1"
+                    picture:
+                      type: string #url-encoded
+                    race:
+                      type: string
+                      example: "Elf"
+                    class:
+                      type: string
+                      example: "Cleric"
+                    level:
+                      type: integer
+                      format: uint
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/delete_character:
+    post:
+      description: Delete a character
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [ Characters ]
+      requestBody:
+        description: ID of character to delete
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+      responses:
+        200:
+          description: Successfully deleted the character
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  character:
+                    $ref: "#/components/schemas/CharacterObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/new_character:
+    post:
+      description: Create a new character
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [Characters]
+      requestBody:
+        description: New character
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CharacterObject"
+      responses:
+        200:
+          description: Successfully updated the character
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  character:
+                    $ref: "#/components/schemas/CharacterObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/update_character:
+    post:
+      description: Update character that already exists
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [Characters]
+      requestBody:
+        description: New or updated character
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                character:
+                  $ref: "#/components/schemas/CharacterObject"
+      responses:
+        200:
+          description: Successfully updated the character
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CharacterObject"
+        400:
+          description: Bad request if can't find character
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cannot find character with id 5"
+                  id:
+                    type: integer
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/get_character:
+    get:
+      description: Get character by id
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [Characters]
+      responses:
+        200:
+          description: Return character
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CharacterObject"
+        400:
+          description: Bad request if can't find character
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cannot find character with id 5"
+                  id:
+                    type: integer
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/register:
+    post:
+      tags: [ Auth ]
+      description: Register user
+      security: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserStructure"
+      responses:
+        200:
+          description: Successful registration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisteredUserStructure"
+        400:
+          description: Bad request if username is already used
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStructure"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/login:
+    post:
+      tags: [ Auth ]
+      description: Login into account
+      security: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserStructure"
+      responses:
+        200:
+          description: Successful registration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisteredUserStructure"
+        401:
+          description: Wrong username/password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStructure"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+
+  
