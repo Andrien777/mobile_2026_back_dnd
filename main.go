@@ -10,6 +10,7 @@ import (
 	"dnd_back/auth"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/induzo/gocom/http/middleware/writablecontext"
 )
 
 func main() {
@@ -33,6 +34,7 @@ func main() {
 	h := api.HandlerFromMux(api.NewStrictHandler(new(server.NewServer()), []api.StrictMiddlewareFunc{}), r)
 	// wrap the existing handler with our global middleware
 	h = mw(h)
+	h = writablecontext.Middleware(h)
 
 	s := &http.Server{
 		Handler: h,

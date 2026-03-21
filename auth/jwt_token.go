@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3filter"
+	"github.com/induzo/gocom/http/middleware/writablecontext"
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
@@ -51,7 +52,7 @@ func NewAuthenticator(v JWSValidator) openapi3filter.AuthenticationFunc {
 // sure that the claims provided by the JWT match the scopes as required in the API.
 func Authenticate(v JWSValidator, ctx context.Context, input *openapi3filter.AuthenticationInput) error {
 	// Our security scheme is named BearerAuth, ensure this is the case
-	if input.SecuritySchemeName != "BearerAuth" {
+	if input.SecuritySchemeName != "JwtBearer" {
 		return fmt.Errorf("security scheme %s != 'BearerAuth'", input.SecuritySchemeName)
 	}
 
@@ -79,7 +80,9 @@ func Authenticate(v JWSValidator, ctx context.Context, input *openapi3filter.Aut
 	// Set the property on the echo context so the handler is able to
 	// access the claims data we generate in here.
 	// TODO
-	ctx.Value(JWTClaimsContextKey).(map[string]interface{})[JWTClaimsContextKey] = token
+	store := writablecontext.FromContext(input.RequestValidationInput.Request.Context())
+	store.Set(JWTClaimsContextKey, token.Subject())
+	//ctx.Value(JWTClaimsContextKey).(map[string]interface{})[JWTClaimsContextKey] = token
 	// ctx.Set(JWTClaimsContextKey, token)
 
 	return nil

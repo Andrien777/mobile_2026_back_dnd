@@ -8,8 +8,8 @@ import (
 	"errors"
 	"log"
 
+	"github.com/induzo/gocom/http/middleware/writablecontext"
 	"github.com/jinzhu/gorm"
-	"github.com/lestrrat-go/jwx/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -46,7 +46,7 @@ func (*Server) PostApiRegister(ctx context.Context, request api.PostApiRegisterR
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(temp.Password), bcrypt.DefaultCost)
 	temp.Password = string(hashedPassword)
 
-	model.GetDB().Table("internal_users").Create(temp)
+	model.GetDB().Table("internal_users").Create(&temp)
 
 	if temp.ID <= 0 {
 		return api.PostApiRegister500JSONResponse{Message: internalErrorString}, nil
@@ -97,7 +97,8 @@ func (*Server) PostApiLogin(ctx context.Context, request api.PostApiLoginRequest
 }
 
 func (*Server) GetApiListCharacters(ctx context.Context, request api.GetApiListCharactersRequestObject) (api.GetApiListCharactersResponseObject, error) {
-	username := ctx.Value(auth.JWTClaimsContextKey).(map[string]interface{})[jwt.SubjectKey].(string)
+	store := writablecontext.FromContext(ctx)
+	username, _ := store.Get(auth.JWTClaimsContextKey)
 	var results []model.InternalCharacter
 	result := model.GetDB().Table("internal_characters").Where("owner = ?", username).Find(&results)
 	if result.Error != nil {
@@ -121,7 +122,8 @@ func (*Server) GetApiListCharacters(ctx context.Context, request api.GetApiListC
 }
 
 func (*Server) GetApiGetCharacter(ctx context.Context, request api.GetApiGetCharacterRequestObject) (api.GetApiGetCharacterResponseObject, error) {
-	username := ctx.Value(auth.JWTClaimsContextKey).(map[string]interface{})[jwt.SubjectKey].(string)
+	store := writablecontext.FromContext(ctx)
+	username, _ := store.Get(auth.JWTClaimsContextKey)
 	temp := &model.InternalCharacter{}
 	err := model.GetDB().Table("internal_characters").Where("id = ?", request.Params.Id).First(temp).Error
 	if err != nil {
@@ -152,7 +154,8 @@ func (*Server) PostApiNewCharacter(ctx context.Context, request api.PostApiNewCh
 }
 
 func (*Server) PostApiUpdateCharacter(ctx context.Context, request api.PostApiUpdateCharacterRequestObject) (api.PostApiUpdateCharacterResponseObject, error) {
-	username := ctx.Value(auth.JWTClaimsContextKey).(map[string]interface{})[jwt.SubjectKey].(string)
+	store := writablecontext.FromContext(ctx)
+	username, _ := store.Get(auth.JWTClaimsContextKey)
 	temp := &model.InternalCharacter{}
 	err := model.GetDB().Table("internal_characters").Where("id = ?", request.Body.Id).First(temp).Error
 	if err != nil {
@@ -172,7 +175,8 @@ func (*Server) PostApiUpdateCharacter(ctx context.Context, request api.PostApiUp
 }
 
 func (*Server) PostApiDeleteCharacter(ctx context.Context, request api.PostApiDeleteCharacterRequestObject) (api.PostApiDeleteCharacterResponseObject, error) {
-	username := ctx.Value(auth.JWTClaimsContextKey).(map[string]interface{})[jwt.SubjectKey].(string)
+	store := writablecontext.FromContext(ctx)
+	username, _ := store.Get(auth.JWTClaimsContextKey)
 	temp := &model.InternalCharacter{}
 	err := model.GetDB().Table("internal_characters").Where("id = ?", request.Body.Id).First(temp).Error
 	if err != nil {
