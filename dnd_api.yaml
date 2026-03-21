@@ -4,7 +4,7 @@ info:
   description: DnD Backend
   version: 1.0.0
 servers:
-  - url: 'todo'
+  - url: 'http://localhost'
 components:
   securitySchemes:
     JwtBearer:

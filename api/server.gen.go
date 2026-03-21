@@ -609,7 +609,7 @@ type CharacterObject struct {
 	Alignment         CharacterObjectAlignment `json:"alignment"`
 	Allies            string                   `json:"allies"`
 	Appearance        string                   `json:"appearance"`
-	ArmourProficiency []string                 `json:"armour_proficiency"`
+	ArmourProficiency []string                 `json:"armour_proficiency" gorm:"type:text[]"`
 	Attacks           []struct {
 		Damage struct {
 			Bonus uint `json:"bonus"`
@@ -619,7 +619,7 @@ type CharacterObject struct {
 			} `json:"dice"`
 		} `json:"damage"`
 		Name  string   `json:"name"`
-		Notes []string `json:"notes"`
+		Notes []string `json:"notes" gorm:"type:text[]"`
 		ToHit struct {
 			Ability CharacterObjectAttacksToHitAbility `json:"ability"`
 			Bonus   uint                               `json:"bonus"`
@@ -649,19 +649,19 @@ type CharacterObject struct {
 		} `json:"features"`
 		Name string `json:"name"`
 	} `json:"class_features"`
-	Conditions []string `json:"conditions"`
+	Conditions []string `json:"conditions" gorm:"type:text[]"`
 	DeathSaves struct {
 		Failure uint `json:"failure"`
 		Success uint `json:"success"`
 	} `json:"death_saves"`
 	Defences struct {
-		Custom     []string `json:"custom"`
-		Immune     []string `json:"immune"`
-		Resistance []string `json:"resistance"`
-		Vulnerable []string `json:"vulnerable"`
+		Custom     []string `json:"custom" gorm:"type:text[]"`
+		Immune     []string `json:"immune" gorm:"type:text[]"`
+		Resistance []string `json:"resistance" gorm:"type:text[]"`
+		Vulnerable []string `json:"vulnerable" gorm:"type:text[]"`
 	} `json:"defences"`
 	Enemies    string                      `json:"enemies"`
-	Expertises []CharacterObjectExpertises `json:"expertises"`
+	Expertises []CharacterObjectExpertises `json:"expertises" gorm:"type:text[]"`
 	Eyes       string                      `json:"eyes"`
 	Faith      string                      `json:"faith"`
 	Feats      []FeatObject                `json:"feats"`
@@ -682,7 +682,7 @@ type CharacterObject struct {
 	Ideals        string       `json:"ideals"`
 	InitiativeMod int          `json:"initiative_mod"`
 	Inventory     []ItemObject `json:"inventory"`
-	Languages     []string     `json:"languages"`
+	Languages     []string     `json:"languages" gorm:"type:text[]"`
 	Level         uint         `json:"level"`
 	Money         struct {
 		Cp uint `json:"cp"`
@@ -696,16 +696,16 @@ type CharacterObject struct {
 	Organizations  string                         `json:"organizations"`
 	Personality    string                         `json:"personality"`
 	Picture        string                         `json:"picture"`
-	Proficiencies  []CharacterObjectProficiencies `json:"proficiencies"`
+	Proficiencies  []CharacterObjectProficiencies `json:"proficiencies" gorm:"type:text[]"`
 	ProficiencyMod uint                           `json:"proficiency_mod"`
 	Race           string                         `json:"race"`
 	RaceTraits     []struct {
 		Description string `json:"description"`
 		Name        string `json:"name"`
 	} `json:"race_traits"`
-	SavingThrowProf []CharacterObjectSavingThrowProf `json:"saving_throw_prof"`
+	SavingThrowProf []CharacterObjectSavingThrowProf `json:"saving_throw_prof" gorm:"type:text[]"`
 	Senses          struct {
-		Other                []string `json:"other"`
+		Other                []string `json:"other" gorm:"type:text[]"`
 		PassiveInsight       uint     `json:"passive_insight"`
 		PassiveInvestigation uint     `json:"passive_investigation"`
 		PassivePerception    uint     `json:"passive_perception"`
@@ -719,8 +719,8 @@ type CharacterObject struct {
 		KnownSpells          []SpellObject `json:"known_spells"`
 		ReadySpells          []SpellObject `json:"ready_spells"`
 	} `json:"spells"`
-	ToolsProficiency  []string `json:"tools_proficiency"`
-	WeaponProficiency []string `json:"weapon_proficiency"`
+	ToolsProficiency  []string `json:"tools_proficiency" gorm:"type:text[]"`
+	WeaponProficiency []string `json:"weapon_proficiency" gorm:"type:text[]"`
 	Weight            uint     `json:"weight"`
 	Xp                uint     `json:"xp"`
 }
@@ -764,7 +764,7 @@ type FeatObject struct {
 // ItemObject defines model for ItemObject.
 type ItemObject struct {
 	Cost     uint                   `json:"cost"`
-	Data     map[string]interface{} `json:"data"`
+	Data     map[string]interface{} `json:"data" gorm:"type:json"`
 	ItemType ItemObjectItemType     `json:"item_type"`
 	Name     string                 `json:"name"`
 	Weight   float32                `json:"weight"`
@@ -2530,8 +2530,8 @@ var swaggerSpec = []string{
 	"IqK7Fqv/sE5TnkUw0Gk6xur9YrV2lc09lpaXbGqz3OHywB7L6DbE+j+9PRIapUdVZ+to4/tl3Nq8t3QI",
 	"Wva9sUtwh8tDWwTja+jrf0B1v7LyY4H7ICsXBbwcNvISgLoz18K+y0FHxF0j7tO/DnF3ij8l9PaI9ICa",
 	"n9jpZ38PBG6R2hgQ/tGMbN6jSkBVAuMXIs29QqfB2rlPf03sewTCGvhzUUHgp8sBDkxIxgL0Y9H2eLLt",
-	"mqOYyWJRNjRyQf1zX/GI+4053YCiIxEyVchWtz5MhFoHPfh3//HKm3PRqPTWcxrs9GeaX3d49jJsNcMe",
-	"zetP638HAAD//6+t53tbVwAA",
+	"mqOYyWJRNjRyQYtrrucnJ5SHQBMdUhrzu8FFRyVkqpCzboOYaLUOelDw/uOVN+eiUfWt5zRY6880v/Tw",
+	"7MXYaoY9ptef1v8OAAD//+PhzPdnVwAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: "dnd_back"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - testdb-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  testdb-data:
