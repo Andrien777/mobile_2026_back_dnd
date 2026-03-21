@@ -139,8 +139,11 @@ func (*Server) GetApiGetCharacter(ctx context.Context, request api.GetApiGetChar
 }
 
 func (*Server) PostApiNewCharacter(ctx context.Context, request api.PostApiNewCharacterRequestObject) (api.PostApiNewCharacterResponseObject, error) {
+	store := writablecontext.FromContext(ctx)
+	username, _ := store.Get(auth.JWTClaimsContextKey)
 	temp := &model.InternalCharacter{}
 	temp.CharacterObject = *request.Body
+	temp.Owner = username.(string)
 
 	err := model.GetDB().Table("internal_characters").Create(temp).Error
 	if err != nil {
