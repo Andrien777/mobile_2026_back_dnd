@@ -979,6 +979,21 @@ paths:
                     type: integer
                   item:
                     $ref: "#/components/schemas/ItemObject"
+        400:
+          description: Bad request if can't find item
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                  - id
+                properties:
+                  message:
+                    type: string
+                    example: "Cannot find item with id 5"
+                  id:
+                    type: integer
         401:
           description: Unauthorised
           content:
@@ -1088,6 +1103,21 @@ paths:
                     type: integer
                   spell:
                     $ref: "#/components/schemas/SpellObject"
+        400:
+          description: Bad request if can't find spell
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                  - id
+                properties:
+                  message:
+                    type: string
+                    example: "Cannot find spell with id 5"
+                  id:
+                    type: integer
         401:
           description: Unauthorised
           content:

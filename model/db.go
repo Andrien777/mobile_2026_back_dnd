@@ -17,7 +17,7 @@ func init() {
 		fmt.Print(err)
 	}
 	db = conn
-	db.Debug().AutoMigrate(&InternalUser{}, &InternalCharacter{})
+	db.Debug().AutoMigrate(&InternalUser{}, &InternalCharacter{}, &InternalSpell{}, &InternalItem{})
 }
 
 func GetDB() *gorm.DB {

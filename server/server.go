@@ -23,8 +23,6 @@ func NewServer() Server {
 }
 
 var internalErrorString = "Internal Error"
-var unauthString = "Unauthorised"
-var emptyString = ""
 var fa *auth.FakeAuthenticator
 var err error
 
@@ -193,5 +191,101 @@ func (*Server) PostApiDeleteCharacter(ctx context.Context, request api.PostApiDe
 	return api.PostApiDeleteCharacter200JSONResponse{
 		Character: temp.CharacterObject,
 		Id:        request.Body.Id,
+	}, nil
+}
+
+func (*Server) PostApiNewSpell(ctx context.Context, request api.PostApiNewSpellRequestObject) (api.PostApiNewSpellResponseObject, error) {
+	temp := &model.InternalSpell{}
+	temp.SpellObject = *request.Body
+	err := model.GetDB().Table("internal_spells").Create(temp).Error
+	if err != nil {
+		return api.PostApiNewSpell500JSONResponse{Message: internalErrorString}, nil
+	}
+	return api.PostApiNewSpell200JSONResponse{
+		Id:    int(temp.ID),
+		Spell: temp.SpellObject,
+	}, nil
+}
+
+func (*Server) GetApiGetAllSpells(ctx context.Context, request api.GetApiGetAllSpellsRequestObject) (api.GetApiGetAllSpellsResponseObject, error) {
+	var results []model.InternalSpell
+	result := model.GetDB().Table("internal_spells").Find(&results)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return api.GetApiGetAllSpells200JSONResponse{}, nil
+		}
+		return api.GetApiGetAllSpells500JSONResponse{Message: internalErrorString}, nil
+	}
+	res := api.GetApiGetAllSpells200JSONResponse{}
+	for _, spell := range results {
+		res = append(res, spell.SpellObject)
+	}
+	return res, nil
+}
+
+func (*Server) PostApiDeleteSpell(ctx context.Context, request api.PostApiDeleteSpellRequestObject) (api.PostApiDeleteSpellResponseObject, error) {
+	temp := &model.InternalSpell{}
+	err := model.GetDB().Table("internal_spells").Where("id = ?", request.Body.Id).First(temp).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return api.PostApiDeleteSpell400JSONResponse{Message: "Spell not found", Id: request.Body.Id}, nil
+		}
+		return api.PostApiDeleteSpell500JSONResponse{Message: internalErrorString}, nil
+	}
+	err = model.GetDB().Table("internal_spells").Delete(temp).Error
+	if err != nil {
+		return api.PostApiDeleteSpell500JSONResponse{Message: internalErrorString}, nil
+	}
+	return api.PostApiDeleteSpell200JSONResponse{
+		Id:    request.Body.Id,
+		Spell: temp.SpellObject,
+	}, nil
+}
+
+func (*Server) PostApiNewItem(ctx context.Context, request api.PostApiNewItemRequestObject) (api.PostApiNewItemResponseObject, error) {
+	temp := &model.InternalItem{}
+	temp.ItemObject = *request.Body
+	err := model.GetDB().Table("internal_items").Create(temp).Error
+	if err != nil {
+		return api.PostApiNewItem500JSONResponse{Message: internalErrorString}, nil
+	}
+	return api.PostApiNewItem200JSONResponse{
+		Id:   int(temp.ID),
+		Item: temp.ItemObject,
+	}, nil
+}
+
+func (*Server) GetApiGetAllItems(ctx context.Context, request api.GetApiGetAllItemsRequestObject) (api.GetApiGetAllItemsResponseObject, error) {
+	var results []model.InternalItem
+	result := model.GetDB().Table("internal_items").Find(&results)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return api.GetApiGetAllItems200JSONResponse{}, nil
+		}
+		return api.GetApiGetAllItems500JSONResponse{Message: internalErrorString}, nil
+	}
+	res := api.GetApiGetAllItems200JSONResponse{}
+	for _, item := range results {
+		res = append(res, item.ItemObject)
+	}
+	return res, nil
+}
+
+func (*Server) PostApiDeleteItem(ctx context.Context, request api.PostApiDeleteItemRequestObject) (api.PostApiDeleteItemResponseObject, error) {
+	temp := &model.InternalItem{}
+	err := model.GetDB().Table("internal_items").Where("id = ?", request.Body.Id).First(temp).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return api.PostApiDeleteItem400JSONResponse{Message: "Item not found", Id: request.Body.Id}, nil
+		}
+		return api.PostApiDeleteItem500JSONResponse{Message: internalErrorString}, nil
+	}
+	err = model.GetDB().Table("internal_items").Delete(temp).Error
+	if err != nil {
+		return api.PostApiDeleteItem500JSONResponse{Message: internalErrorString}, nil
+	}
+	return api.PostApiDeleteItem200JSONResponse{
+		Id:   request.Body.Id,
+		Item: temp.ItemObject,
 	}, nil
 }
