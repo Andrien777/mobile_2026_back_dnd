@@ -14,6 +14,9 @@ components:
   schemas:
     UserStructure:
       type: object
+      required:
+        - username
+        - password
       properties:
         username:
           type: string
@@ -23,29 +26,31 @@ components:
           example: "****"
     RegisteredUserStructure:
       type: object
+      required:
+        - username
+        - token
       properties:
-        ID:
-          type: integer
-          example: 1
-        CreatedAt:
-          type: string
-          example: "2026-03-20T14:36:33.123445+03:00"
-        UpdatedAt:
-          type: string
-          example: "2026-03-20T14:36:33.123445+03:00"
-        DeletedAt:
-          type: string
-          example: null
         username:
           type: string
           example: "johndoe123"
-        password:
-          type: string
-          example: ""
         token:
           type: string
     SpellObject:
       type: object
+      required:
+        - name
+        - school
+        - level
+        - components
+        - time_to_cast
+        - target
+        - range
+        - duration
+        - effect
+        - upcast
+        - concentration
+        - ritual
+        - description
       properties:
         name:
           type: string
@@ -59,6 +64,10 @@ components:
           example: 0
         components:
           type: object
+          required:
+            - verbal
+            - somatic
+            - material
           properties:
             verbal:
               type: boolean
@@ -66,6 +75,9 @@ components:
               type: boolean
             material:
               type: object
+              required:
+                - status
+                - components
               properties:
                 status:
                   type: boolean
@@ -73,6 +85,10 @@ components:
                   type: string
         time_to_cast:
           type: object
+          required:
+            - amount
+            - time
+            - notes
           properties:
             amount:
               type: integer
@@ -89,6 +105,9 @@ components:
               type: string
         target:
           type: object
+          required:
+            - target_type
+            - size
           properties:
             target_type:
               type: string
@@ -98,6 +117,10 @@ components:
               format: uint
         range:
           type: object
+          required:
+            - range_type
+            - amount
+            - notes
           properties:
             range_type:
               type: string
@@ -113,6 +136,9 @@ components:
               type: string
         duration:
           type: object
+          required:
+            - duration
+            - duration_type
           properties:
             duration_type:
               type: string
@@ -126,6 +152,11 @@ components:
               type: integer
         effect:
           type: object
+          required:
+            - effect
+            - ability
+            - dmg_type
+            - dice
           properties:
             effect:
               type: string
@@ -148,6 +179,10 @@ components:
               type: string
             dice:
               type: object
+              required:
+                - amount
+                - value
+                - bonus
               properties:
                 amount:
                   type: integer
@@ -168,6 +203,9 @@ components:
                   example: 1
         upcast:
           type: object
+          required:
+            - upcast_type
+            - dice
           properties:
             upcast_type:
               type: string
@@ -176,6 +214,9 @@ components:
                 - Cantrip
             dice:
               type: object
+              required:
+                - amount
+                - value
               properties:
                 amount:
                   type: integer
@@ -198,6 +239,10 @@ components:
           type: string
     FeatObject:
       type: object
+      required:
+        - name
+        - prerequisites
+        - benefits
       properties:
         name:
           type: string
@@ -209,6 +254,12 @@ components:
           type: string
     ItemObject:
       type: object
+      required:
+        - name
+        - item_type
+        - cost
+        - weight
+        - data
       properties:
         name:
           type: string
@@ -233,6 +284,61 @@ components:
           type: object
     CharacterObject:
       type: object
+      required:
+        - name
+        - picture
+        - race
+        - xp
+        - level
+        - class
+        - alignment
+        - background
+        - hp
+        - ac
+        - shielded
+        - speed
+        - death_saves
+        - abilities
+        - initiative_mod
+        - conditions
+        - saving_throw_prof
+        - defences
+        - proficiency_mod
+        - senses
+        - proficiencies
+        - expertises
+        - attacks
+        - bonus_actions
+        - spells
+        - armour_proficiency
+        - weapon_proficiency
+        - tools_proficiency
+        - languages
+        - class_features
+        - race_traits
+        - feats
+        - gender
+        - eyes
+        - size
+        - height
+        - faith
+        - hair
+        - skin
+        - age
+        - weight
+        - personality
+        - ideals
+        - bonds
+        - flaws
+        - appearance
+        - organizations
+        - allies
+        - enemies
+        - backstory
+        - notes
+        - money
+        - capacity
+        - inventory
       properties:
         name:
           type: string
@@ -254,6 +360,10 @@ components:
           type: array
           items:
             type: object
+            requires:
+              - name
+              - level
+              - subclass
             properties:
               name:
                 type: string
@@ -280,6 +390,9 @@ components:
           example: CG
         background:
           type: object
+          required:
+            - name
+            - description
           properties:
             name:
               type: string
@@ -288,6 +401,11 @@ components:
               type: string
         hp:
           type: object
+          required:
+            - current
+            - max
+            - temp
+            - hit_dice
           properties:
             current:
               type: integer
@@ -303,6 +421,10 @@ components:
               example: 17
             hit_dice:
               type: object
+              required:
+                - max
+                - left
+                - value
               properties:
                 max:
                   type: integer
@@ -332,6 +454,9 @@ components:
           example: 30
         death_saves:
           type: object
+          required:
+            - success
+            - failure
           properties:
             success:
               type: integer
@@ -343,6 +468,13 @@ components:
               example: 0
         abilities:
           type: object
+          required:
+            - str
+            - con
+            - dex
+            - wis
+            - int
+            - cha
           properties:
             str:
               type: integer
@@ -389,6 +521,11 @@ components:
               - CHA
         defences:
           type: object
+          required:
+            - resistance
+            - immune
+            - vulnerable
+            - custom
           properties:
             resistance:
               type: array
@@ -412,6 +549,11 @@ components:
           example: 3
         senses:
           type: object
+          required:
+            - passive_insight
+            - passive_investigation
+            - passive_perception
+            - other
           properties:
             passive_perception:
               type: integer
@@ -480,12 +622,20 @@ components:
           type: array
           items:
             type: object
+            required:
+              - name
+              - to_hit
+              - damage
+              - notes
             properties:
               name:
                 type: string
                 example: "Dagger"
               to_hit:
                 type: object
+                required:
+                  - ability
+                  - bonus
                 properties:
                   ability:
                     type: string
@@ -502,9 +652,15 @@ components:
                     example: 5
               damage:
                 type: object
+                required:
+                  - dice
+                  - bonus
                 properties:
                   dice:
                     type: object
+                    required:
+                      - amount
+                      - value
                     properties:
                       amount:
                         type: integer
@@ -532,6 +688,10 @@ components:
           type: array
           items:
             type: object
+            required:
+              - name
+              - flavour_text
+              - other_data
             properties:
               name:
                 type: string
@@ -542,6 +702,10 @@ components:
                 type: object
         spells:
           type: object
+          required:
+            - current_concentration
+            - ready_spells
+            - known_spells
           properties:
             current_concentration:
               $ref: "#/components/schemas/SpellObject"
@@ -577,6 +741,9 @@ components:
           type: array
           items:
             type: object
+            required:
+              - name
+              - features
             properties:
               name:
                 type: string
@@ -585,6 +752,9 @@ components:
                 type: array
                 items:
                   type: object
+                  required:
+                    - name
+                    - description
                   properties:
                     name:
                       type: string
@@ -595,6 +765,9 @@ components:
           type: array
           items:
             type: object
+            required:
+              - name
+              - description
             properties:
               name:
                 type: string
@@ -658,6 +831,12 @@ components:
           type: string
         money:
           type: object
+          required:
+            - cp
+            - sp
+            - ep
+            - gp
+            - pp
           properties:
             cp:
               type: integer
@@ -689,6 +868,8 @@ components:
             $ref: "#/components/schemas/ItemObject"
     ErrorResponse:
       type: object
+      required:
+        - message
       properties:
         message:
           type: string
@@ -719,6 +900,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - id
+                  - item
                 properties:
                   id:
                     type: integer
@@ -775,6 +959,8 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - id
               properties:
                 id:
                   type: integer
@@ -785,10 +971,13 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - id
+                  - item
                 properties:
                   id:
                     type: integer
-                  character:
+                  item:
                     $ref: "#/components/schemas/ItemObject"
         401:
           description: Unauthorised
@@ -820,10 +1009,13 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - id
+                  - spell
                 properties:
                   id:
                     type: integer
-                  item:
+                  spell:
                     $ref: "#/components/schemas/SpellObject"
         401:
           description: Unauthorised
@@ -876,6 +1068,8 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - id
               properties:
                 id:
                   type: integer
@@ -886,10 +1080,13 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - id
+                  - spell
                 properties:
                   id:
                     type: integer
-                  character:
+                  spell:
                     $ref: "#/components/schemas/SpellObject"
         401:
           description: Unauthorised
@@ -918,6 +1115,13 @@ paths:
                 type: array
                 items:
                   type: object
+                  required:
+                    - id
+                    - name
+                    - picture
+                    - race
+                    - class
+                    - level
                   properties:
                     id:
                       type: integer
@@ -959,6 +1163,8 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - id
               properties:
                 id:
                   type: integer
@@ -969,11 +1175,29 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - id
+                  - character
                 properties:
                   id:
                     type: integer
                   character:
                     $ref: "#/components/schemas/CharacterObject"
+        400:
+          description: Bad request if can't find character
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                  - id
+                properties:
+                  message:
+                    type: string
+                    example: "Cannot find character with id 5"
+                  id:
+                    type: integer
         401:
           description: Unauthorised
           content:
@@ -1005,6 +1229,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - id
+                  - character
                 properties:
                   id:
                     type: integer
@@ -1034,6 +1261,9 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - id
+                - character
               properties:
                 id:
                   type: integer
@@ -1052,6 +1282,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - message
+                  - id
                 properties:
                   message:
                     type: string
@@ -1095,6 +1328,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - message
+                  - id
                 properties:
                   message:
                     type: string

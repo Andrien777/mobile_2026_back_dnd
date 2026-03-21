@@ -596,133 +596,133 @@ func (e SpellObjectUpcastUpcastType) Valid() bool {
 
 // CharacterObject defines model for CharacterObject.
 type CharacterObject struct {
-	Abilities *struct {
-		Cha *uint `json:"cha,omitempty"`
-		Con *uint `json:"con,omitempty"`
-		Dex *uint `json:"dex,omitempty"`
-		Int *uint `json:"int,omitempty"`
-		Str *uint `json:"str,omitempty"`
-		Wis *uint `json:"wis,omitempty"`
-	} `json:"abilities,omitempty"`
-	Ac                *uint                     `json:"ac,omitempty"`
-	Age               *string                   `json:"age,omitempty"`
-	Alignment         *CharacterObjectAlignment `json:"alignment,omitempty"`
-	Allies            *string                   `json:"allies,omitempty"`
-	Appearance        *string                   `json:"appearance,omitempty"`
-	ArmourProficiency *[]string                 `json:"armour_proficiency,omitempty"`
-	Attacks           *[]struct {
-		Damage *struct {
-			Bonus *uint `json:"bonus,omitempty"`
-			Dice  *struct {
-				Amount *uint                                  `json:"amount,omitempty"`
-				Value  *CharacterObjectAttacksDamageDiceValue `json:"value,omitempty"`
-			} `json:"dice,omitempty"`
-		} `json:"damage,omitempty"`
-		Name  *string   `json:"name,omitempty"`
-		Notes *[]string `json:"notes,omitempty"`
-		ToHit *struct {
-			Ability *CharacterObjectAttacksToHitAbility `json:"ability,omitempty"`
-			Bonus   *uint                               `json:"bonus,omitempty"`
-		} `json:"to_hit,omitempty"`
-	} `json:"attacks,omitempty"`
-	Background *struct {
-		Description *string `json:"description,omitempty"`
-		Name        *string `json:"name,omitempty"`
-	} `json:"background,omitempty"`
-	Backstory    *string `json:"backstory,omitempty"`
-	Bonds        *string `json:"bonds,omitempty"`
-	BonusActions *[]struct {
-		FlavourText *string                 `json:"flavour_text,omitempty"`
-		Name        *string                 `json:"name,omitempty"`
-		OtherData   *map[string]interface{} `json:"other_data,omitempty"`
-	} `json:"bonus_actions,omitempty"`
-	Capacity *uint `json:"capacity,omitempty"`
-	Class    *[]struct {
+	Abilities struct {
+		Cha uint `json:"cha"`
+		Con uint `json:"con"`
+		Dex uint `json:"dex"`
+		Int uint `json:"int"`
+		Str uint `json:"str"`
+		Wis uint `json:"wis"`
+	} `json:"abilities"`
+	Ac                uint                     `json:"ac"`
+	Age               string                   `json:"age"`
+	Alignment         CharacterObjectAlignment `json:"alignment"`
+	Allies            string                   `json:"allies"`
+	Appearance        string                   `json:"appearance"`
+	ArmourProficiency []string                 `json:"armour_proficiency"`
+	Attacks           []struct {
+		Damage struct {
+			Bonus uint `json:"bonus"`
+			Dice  struct {
+				Amount uint                                  `json:"amount"`
+				Value  CharacterObjectAttacksDamageDiceValue `json:"value"`
+			} `json:"dice"`
+		} `json:"damage"`
+		Name  string   `json:"name"`
+		Notes []string `json:"notes"`
+		ToHit struct {
+			Ability CharacterObjectAttacksToHitAbility `json:"ability"`
+			Bonus   uint                               `json:"bonus"`
+		} `json:"to_hit"`
+	} `json:"attacks"`
+	Background struct {
+		Description string `json:"description"`
+		Name        string `json:"name"`
+	} `json:"background"`
+	Backstory    string `json:"backstory"`
+	Bonds        string `json:"bonds"`
+	BonusActions []struct {
+		FlavourText string                 `json:"flavour_text"`
+		Name        string                 `json:"name"`
+		OtherData   map[string]interface{} `json:"other_data"`
+	} `json:"bonus_actions"`
+	Capacity uint `json:"capacity"`
+	Class    []struct {
 		Level    *uint   `json:"level,omitempty"`
 		Name     *string `json:"name,omitempty"`
 		Subclass *string `json:"subclass,omitempty"`
-	} `json:"class,omitempty"`
-	ClassFeatures *[]struct {
-		Features *[]struct {
-			Description *string `json:"description,omitempty"`
-			Name        *string `json:"name,omitempty"`
-		} `json:"features,omitempty"`
-		Name *string `json:"name,omitempty"`
-	} `json:"class_features,omitempty"`
-	Conditions *[]string `json:"conditions,omitempty"`
-	DeathSaves *struct {
-		Failure *uint `json:"failure,omitempty"`
-		Success *uint `json:"success,omitempty"`
-	} `json:"death_saves,omitempty"`
-	Defences *struct {
-		Custom     *[]string `json:"custom,omitempty"`
-		Immune     *[]string `json:"immune,omitempty"`
-		Resistance *[]string `json:"resistance,omitempty"`
-		Vulnerable *[]string `json:"vulnerable,omitempty"`
-	} `json:"defences,omitempty"`
-	Enemies    *string                      `json:"enemies,omitempty"`
-	Expertises *[]CharacterObjectExpertises `json:"expertises,omitempty"`
-	Eyes       *string                      `json:"eyes,omitempty"`
-	Faith      *string                      `json:"faith,omitempty"`
-	Feats      *[]FeatObject                `json:"feats,omitempty"`
-	Flaws      *string                      `json:"flaws,omitempty"`
-	Gender     *string                      `json:"gender,omitempty"`
-	Hair       *string                      `json:"hair,omitempty"`
-	Height     *string                      `json:"height,omitempty"`
-	Hp         *struct {
-		Current *uint `json:"current,omitempty"`
-		HitDice *struct {
-			Left  *uint                          `json:"left,omitempty"`
-			Max   *uint                          `json:"max,omitempty"`
-			Value *CharacterObjectHpHitDiceValue `json:"value,omitempty"`
-		} `json:"hit_dice,omitempty"`
-		Max  *uint `json:"max,omitempty"`
-		Temp *uint `json:"temp,omitempty"`
-	} `json:"hp,omitempty"`
-	Ideals        *string       `json:"ideals,omitempty"`
-	InitiativeMod *int          `json:"initiative_mod,omitempty"`
-	Inventory     *[]ItemObject `json:"inventory,omitempty"`
-	Languages     *[]string     `json:"languages,omitempty"`
-	Level         *uint         `json:"level,omitempty"`
-	Money         *struct {
-		Cp *uint `json:"cp,omitempty"`
-		Ep *uint `json:"ep,omitempty"`
-		Gp *uint `json:"gp,omitempty"`
-		Pp *uint `json:"pp,omitempty"`
-		Sp *uint `json:"sp,omitempty"`
-	} `json:"money,omitempty"`
-	Name           *string                         `json:"name,omitempty"`
-	Notes          *string                         `json:"notes,omitempty"`
-	Organizations  *string                         `json:"organizations,omitempty"`
-	Personality    *string                         `json:"personality,omitempty"`
-	Picture        *string                         `json:"picture,omitempty"`
-	Proficiencies  *[]CharacterObjectProficiencies `json:"proficiencies,omitempty"`
-	ProficiencyMod *uint                           `json:"proficiency_mod,omitempty"`
-	Race           *string                         `json:"race,omitempty"`
-	RaceTraits     *[]struct {
-		Description *string `json:"description,omitempty"`
-		Name        *string `json:"name,omitempty"`
-	} `json:"race_traits,omitempty"`
-	SavingThrowProf *[]CharacterObjectSavingThrowProf `json:"saving_throw_prof,omitempty"`
-	Senses          *struct {
-		Other                *[]string `json:"other,omitempty"`
-		PassiveInsight       *uint     `json:"passive_insight,omitempty"`
-		PassiveInvestigation *uint     `json:"passive_investigation,omitempty"`
-		PassivePerception    *uint     `json:"passive_perception,omitempty"`
-	} `json:"senses,omitempty"`
-	Shielded *bool                `json:"shielded,omitempty"`
-	Size     *CharacterObjectSize `json:"size,omitempty"`
-	Skin     *string              `json:"skin,omitempty"`
-	Speed    *uint                `json:"speed,omitempty"`
-	Spells   *struct {
-		CurrentConcentration *SpellObject   `json:"current_concentration,omitempty"`
-		KnownSpells          *[]SpellObject `json:"known_spells,omitempty"`
-		ReadySpells          *[]SpellObject `json:"ready_spells,omitempty"`
-	} `json:"spells,omitempty"`
-	ToolsProficiency  *[]string `json:"tools_proficiency,omitempty"`
-	WeaponProficiency *[]string `json:"weapon_proficiency,omitempty"`
-	Weight            *uint     `json:"weight,omitempty"`
-	Xp                *uint     `json:"xp,omitempty"`
+	} `json:"class"`
+	ClassFeatures []struct {
+		Features []struct {
+			Description string `json:"description"`
+			Name        string `json:"name"`
+		} `json:"features"`
+		Name string `json:"name"`
+	} `json:"class_features"`
+	Conditions []string `json:"conditions"`
+	DeathSaves struct {
+		Failure uint `json:"failure"`
+		Success uint `json:"success"`
+	} `json:"death_saves"`
+	Defences struct {
+		Custom     []string `json:"custom"`
+		Immune     []string `json:"immune"`
+		Resistance []string `json:"resistance"`
+		Vulnerable []string `json:"vulnerable"`
+	} `json:"defences"`
+	Enemies    string                      `json:"enemies"`
+	Expertises []CharacterObjectExpertises `json:"expertises"`
+	Eyes       string                      `json:"eyes"`
+	Faith      string                      `json:"faith"`
+	Feats      []FeatObject                `json:"feats"`
+	Flaws      string                      `json:"flaws"`
+	Gender     string                      `json:"gender"`
+	Hair       string                      `json:"hair"`
+	Height     string                      `json:"height"`
+	Hp         struct {
+		Current uint `json:"current"`
+		HitDice struct {
+			Left  uint                          `json:"left"`
+			Max   uint                          `json:"max"`
+			Value CharacterObjectHpHitDiceValue `json:"value"`
+		} `json:"hit_dice"`
+		Max  uint `json:"max"`
+		Temp uint `json:"temp"`
+	} `json:"hp"`
+	Ideals        string       `json:"ideals"`
+	InitiativeMod int          `json:"initiative_mod"`
+	Inventory     []ItemObject `json:"inventory"`
+	Languages     []string     `json:"languages"`
+	Level         uint         `json:"level"`
+	Money         struct {
+		Cp uint `json:"cp"`
+		Ep uint `json:"ep"`
+		Gp uint `json:"gp"`
+		Pp uint `json:"pp"`
+		Sp uint `json:"sp"`
+	} `json:"money"`
+	Name           string                         `json:"name"`
+	Notes          string                         `json:"notes"`
+	Organizations  string                         `json:"organizations"`
+	Personality    string                         `json:"personality"`
+	Picture        string                         `json:"picture"`
+	Proficiencies  []CharacterObjectProficiencies `json:"proficiencies"`
+	ProficiencyMod uint                           `json:"proficiency_mod"`
+	Race           string                         `json:"race"`
+	RaceTraits     []struct {
+		Description string `json:"description"`
+		Name        string `json:"name"`
+	} `json:"race_traits"`
+	SavingThrowProf []CharacterObjectSavingThrowProf `json:"saving_throw_prof"`
+	Senses          struct {
+		Other                []string `json:"other"`
+		PassiveInsight       uint     `json:"passive_insight"`
+		PassiveInvestigation uint     `json:"passive_investigation"`
+		PassivePerception    uint     `json:"passive_perception"`
+	} `json:"senses"`
+	Shielded bool                `json:"shielded"`
+	Size     CharacterObjectSize `json:"size"`
+	Skin     string              `json:"skin"`
+	Speed    uint                `json:"speed"`
+	Spells   struct {
+		CurrentConcentration SpellObject   `json:"current_concentration"`
+		KnownSpells          []SpellObject `json:"known_spells"`
+		ReadySpells          []SpellObject `json:"ready_spells"`
+	} `json:"spells"`
+	ToolsProficiency  []string `json:"tools_proficiency"`
+	WeaponProficiency []string `json:"weapon_proficiency"`
+	Weight            uint     `json:"weight"`
+	Xp                uint     `json:"xp"`
 }
 
 // CharacterObjectAlignment defines model for CharacterObject.Alignment.
@@ -751,23 +751,23 @@ type CharacterObjectSize string
 
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
-	Message *string `json:"message,omitempty"`
+	Message string `json:"message"`
 }
 
 // FeatObject defines model for FeatObject.
 type FeatObject struct {
-	Benefits      *string `json:"benefits,omitempty"`
-	Name          *string `json:"name,omitempty"`
-	Prerequisites *string `json:"prerequisites,omitempty"`
+	Benefits      string `json:"benefits"`
+	Name          string `json:"name"`
+	Prerequisites string `json:"prerequisites"`
 }
 
 // ItemObject defines model for ItemObject.
 type ItemObject struct {
-	Cost     *uint                   `json:"cost,omitempty"`
-	Data     *map[string]interface{} `json:"data,omitempty"`
-	ItemType *ItemObjectItemType     `json:"item_type,omitempty"`
-	Name     *string                 `json:"name,omitempty"`
-	Weight   *float32                `json:"weight,omitempty"`
+	Cost     uint                   `json:"cost"`
+	Data     map[string]interface{} `json:"data"`
+	ItemType ItemObjectItemType     `json:"item_type"`
+	Name     string                 `json:"name"`
+	Weight   float32                `json:"weight"`
 }
 
 // ItemObjectItemType defines model for ItemObject.ItemType.
@@ -775,66 +775,61 @@ type ItemObjectItemType string
 
 // RegisteredUserStructure defines model for RegisteredUserStructure.
 type RegisteredUserStructure struct {
-	CreatedAt *string `json:"CreatedAt,omitempty"`
-	DeletedAt *string `json:"DeletedAt,omitempty"`
-	ID        *int    `json:"ID,omitempty"`
-	UpdatedAt *string `json:"UpdatedAt,omitempty"`
-	Password  *string `json:"password,omitempty"`
-	Token     *string `json:"token,omitempty"`
-	Username  *string `json:"username,omitempty"`
+	Token    string `json:"token"`
+	Username string `json:"username"`
 }
 
 // SpellObject defines model for SpellObject.
 type SpellObject struct {
-	Components *struct {
-		Material *struct {
-			Components *string `json:"components,omitempty"`
-			Status     *bool   `json:"status,omitempty"`
-		} `json:"material,omitempty"`
-		Somatic *bool `json:"somatic,omitempty"`
-		Verbal  *bool `json:"verbal,omitempty"`
-	} `json:"components,omitempty"`
-	Concentration *bool   `json:"concentration,omitempty"`
-	Description   *string `json:"description,omitempty"`
-	Duration      *struct {
-		Duration     *int                             `json:"duration,omitempty"`
-		DurationType *SpellObjectDurationDurationType `json:"duration_type,omitempty"`
-	} `json:"duration,omitempty"`
-	Effect *struct {
-		Ability *SpellObjectEffectAbility `json:"ability,omitempty"`
-		Dice    *struct {
-			Amount *uint                       `json:"amount,omitempty"`
-			Bonus  *uint                       `json:"bonus,omitempty"`
-			Value  *SpellObjectEffectDiceValue `json:"value,omitempty"`
-		} `json:"dice,omitempty"`
-		DmgType *string                  `json:"dmg_type,omitempty"`
-		Effect  *SpellObjectEffectEffect `json:"effect,omitempty"`
-	} `json:"effect,omitempty"`
-	Level *uint   `json:"level,omitempty"`
-	Name  *string `json:"name,omitempty"`
-	Range *struct {
-		Amount    *int                       `json:"amount,omitempty"`
-		Notes     *string                    `json:"notes,omitempty"`
-		RangeType *SpellObjectRangeRangeType `json:"range_type,omitempty"`
-	} `json:"range,omitempty"`
-	Ritual *bool   `json:"ritual,omitempty"`
-	School *string `json:"school,omitempty"`
-	Target *struct {
-		Size       *uint   `json:"size,omitempty"`
-		TargetType *string `json:"target_type,omitempty"`
-	} `json:"target,omitempty"`
-	TimeToCast *struct {
-		Amount *uint                      `json:"amount,omitempty"`
-		Notes  *string                    `json:"notes,omitempty"`
-		Time   *SpellObjectTimeToCastTime `json:"time,omitempty"`
-	} `json:"time_to_cast,omitempty"`
-	Upcast *struct {
-		Dice *struct {
-			Amount *uint                       `json:"amount,omitempty"`
-			Value  *SpellObjectUpcastDiceValue `json:"value,omitempty"`
-		} `json:"dice,omitempty"`
-		UpcastType *SpellObjectUpcastUpcastType `json:"upcast_type,omitempty"`
-	} `json:"upcast,omitempty"`
+	Components struct {
+		Material struct {
+			Components string `json:"components"`
+			Status     bool   `json:"status"`
+		} `json:"material"`
+		Somatic bool `json:"somatic"`
+		Verbal  bool `json:"verbal"`
+	} `json:"components"`
+	Concentration bool   `json:"concentration"`
+	Description   string `json:"description"`
+	Duration      struct {
+		Duration     int                             `json:"duration"`
+		DurationType SpellObjectDurationDurationType `json:"duration_type"`
+	} `json:"duration"`
+	Effect struct {
+		Ability SpellObjectEffectAbility `json:"ability"`
+		Dice    struct {
+			Amount uint                       `json:"amount"`
+			Bonus  uint                       `json:"bonus"`
+			Value  SpellObjectEffectDiceValue `json:"value"`
+		} `json:"dice"`
+		DmgType string                  `json:"dmg_type"`
+		Effect  SpellObjectEffectEffect `json:"effect"`
+	} `json:"effect"`
+	Level uint   `json:"level"`
+	Name  string `json:"name"`
+	Range struct {
+		Amount    int                       `json:"amount"`
+		Notes     string                    `json:"notes"`
+		RangeType SpellObjectRangeRangeType `json:"range_type"`
+	} `json:"range"`
+	Ritual bool   `json:"ritual"`
+	School string `json:"school"`
+	Target struct {
+		Size       uint   `json:"size"`
+		TargetType string `json:"target_type"`
+	} `json:"target"`
+	TimeToCast struct {
+		Amount uint                      `json:"amount"`
+		Notes  string                    `json:"notes"`
+		Time   SpellObjectTimeToCastTime `json:"time"`
+	} `json:"time_to_cast"`
+	Upcast struct {
+		Dice struct {
+			Amount uint                       `json:"amount"`
+			Value  SpellObjectUpcastDiceValue `json:"value"`
+		} `json:"dice"`
+		UpcastType SpellObjectUpcastUpcastType `json:"upcast_type"`
+	} `json:"upcast"`
 }
 
 // SpellObjectDurationDurationType defines model for SpellObject.Duration.DurationType.
@@ -863,23 +858,23 @@ type SpellObjectUpcastUpcastType string
 
 // UserStructure defines model for UserStructure.
 type UserStructure struct {
-	Password *string `json:"password,omitempty"`
-	Username *string `json:"username,omitempty"`
+	Password string `json:"password"`
+	Username string `json:"username"`
 }
 
 // PostApiDeleteCharacterJSONBody defines parameters for PostApiDeleteCharacter.
 type PostApiDeleteCharacterJSONBody struct {
-	Id *int `json:"id,omitempty"`
+	Id int `json:"id"`
 }
 
 // PostApiDeleteItemJSONBody defines parameters for PostApiDeleteItem.
 type PostApiDeleteItemJSONBody struct {
-	Id *int `json:"id,omitempty"`
+	Id int `json:"id"`
 }
 
 // PostApiDeleteSpellJSONBody defines parameters for PostApiDeleteSpell.
 type PostApiDeleteSpellJSONBody struct {
-	Id *int `json:"id,omitempty"`
+	Id int `json:"id"`
 }
 
 // GetApiGetCharacterParams defines parameters for GetApiGetCharacter.
@@ -889,8 +884,8 @@ type GetApiGetCharacterParams struct {
 
 // PostApiUpdateCharacterJSONBody defines parameters for PostApiUpdateCharacter.
 type PostApiUpdateCharacterJSONBody struct {
-	Character *CharacterObject `json:"character,omitempty"`
-	Id        *int             `json:"id,omitempty"`
+	Character CharacterObject `json:"character"`
+	Id        int             `json:"id"`
 }
 
 // PostApiDeleteCharacterJSONRequestBody defines body for PostApiDeleteCharacter for application/json ContentType.
@@ -1474,13 +1469,25 @@ type PostApiDeleteCharacterResponseObject interface {
 }
 
 type PostApiDeleteCharacter200JSONResponse struct {
-	Character *CharacterObject `json:"character,omitempty"`
-	Id        *int             `json:"id,omitempty"`
+	Character CharacterObject `json:"character"`
+	Id        int             `json:"id"`
 }
 
 func (response PostApiDeleteCharacter200JSONResponse) VisitPostApiDeleteCharacterResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiDeleteCharacter400JSONResponse struct {
+	Id      int    `json:"id"`
+	Message string `json:"message"`
+}
+
+func (response PostApiDeleteCharacter400JSONResponse) VisitPostApiDeleteCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -1512,8 +1519,8 @@ type PostApiDeleteItemResponseObject interface {
 }
 
 type PostApiDeleteItem200JSONResponse struct {
-	Character *ItemObject `json:"character,omitempty"`
-	Id        *int        `json:"id,omitempty"`
+	Id   int        `json:"id"`
+	Item ItemObject `json:"item"`
 }
 
 func (response PostApiDeleteItem200JSONResponse) VisitPostApiDeleteItemResponse(w http.ResponseWriter) error {
@@ -1550,8 +1557,8 @@ type PostApiDeleteSpellResponseObject interface {
 }
 
 type PostApiDeleteSpell200JSONResponse struct {
-	Character *SpellObject `json:"character,omitempty"`
-	Id        *int         `json:"id,omitempty"`
+	Id    int         `json:"id"`
+	Spell SpellObject `json:"spell"`
 }
 
 func (response PostApiDeleteSpell200JSONResponse) VisitPostApiDeleteSpellResponse(w http.ResponseWriter) error {
@@ -1665,8 +1672,8 @@ func (response GetApiGetCharacter200JSONResponse) VisitGetApiGetCharacterRespons
 }
 
 type GetApiGetCharacter400JSONResponse struct {
-	Id      *int    `json:"id,omitempty"`
-	Message *string `json:"message,omitempty"`
+	Id      int    `json:"id"`
+	Message string `json:"message"`
 }
 
 func (response GetApiGetCharacter400JSONResponse) VisitGetApiGetCharacterResponse(w http.ResponseWriter) error {
@@ -1702,12 +1709,12 @@ type GetApiListCharactersResponseObject interface {
 }
 
 type GetApiListCharacters200JSONResponse []struct {
-	Class   *string `json:"class,omitempty"`
-	Id      *int    `json:"id,omitempty"`
-	Level   *uint   `json:"level,omitempty"`
-	Name    *string `json:"name,omitempty"`
-	Picture *string `json:"picture,omitempty"`
-	Race    *string `json:"race,omitempty"`
+	Class   string `json:"class"`
+	Id      int    `json:"id"`
+	Level   uint   `json:"level"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
+	Race    string `json:"race"`
 }
 
 func (response GetApiListCharacters200JSONResponse) VisitGetApiListCharactersResponse(w http.ResponseWriter) error {
@@ -1779,8 +1786,8 @@ type PostApiNewCharacterResponseObject interface {
 }
 
 type PostApiNewCharacter200JSONResponse struct {
-	Character *CharacterObject `json:"character,omitempty"`
-	Id        *int             `json:"id,omitempty"`
+	Character CharacterObject `json:"character"`
+	Id        int             `json:"id"`
 }
 
 func (response PostApiNewCharacter200JSONResponse) VisitPostApiNewCharacterResponse(w http.ResponseWriter) error {
@@ -1817,8 +1824,8 @@ type PostApiNewItemResponseObject interface {
 }
 
 type PostApiNewItem200JSONResponse struct {
-	Id   *int        `json:"id,omitempty"`
-	Item *ItemObject `json:"item,omitempty"`
+	Id   int        `json:"id"`
+	Item ItemObject `json:"item"`
 }
 
 func (response PostApiNewItem200JSONResponse) VisitPostApiNewItemResponse(w http.ResponseWriter) error {
@@ -1855,8 +1862,8 @@ type PostApiNewSpellResponseObject interface {
 }
 
 type PostApiNewSpell200JSONResponse struct {
-	Id   *int         `json:"id,omitempty"`
-	Item *SpellObject `json:"item,omitempty"`
+	Id    int         `json:"id"`
+	Spell SpellObject `json:"spell"`
 }
 
 func (response PostApiNewSpell200JSONResponse) VisitPostApiNewSpellResponse(w http.ResponseWriter) error {
@@ -1937,8 +1944,8 @@ func (response PostApiUpdateCharacter200JSONResponse) VisitPostApiUpdateCharacte
 }
 
 type PostApiUpdateCharacter400JSONResponse struct {
-	Id      *int    `json:"id,omitempty"`
-	Message *string `json:"message,omitempty"`
+	Id      int    `json:"id"`
+	Message string `json:"message"`
 }
 
 func (response PostApiUpdateCharacter400JSONResponse) VisitPostApiUpdateCharacterResponse(w http.ResponseWriter) error {
@@ -2445,55 +2452,61 @@ func (sh *strictHandler) PostApiUpdateCharacter(w http.ResponseWriter, r *http.R
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"ehQB9unh6b8BAAD//+Q96pHSSwAA",
+	"H4sIAAAAAAAC/+xbbW/bOBL+K4LugAMKbZO0u3d7+ZYmbZNDmhZxil1gURhjaSyxoUgtSdn1LvzfDyT1",
+	"LsqW7XSve+svqiORw+G88ZkZ9nc/5GnGGTIl/fPffRkmmIL5eZmAgFCheD/7jKHSrzLBMxSKoBkAM0JJ",
+	"+Uf7U5iA/ge/QJpR9M/PTgN/zkUKyj/3c8KUH/hqlaF/7hOmMEbhrwM/5GyPWRF+2WOWfr/7LKnEHrOW",
+	"RO48ax34An/NicDIP//FLGwFZDdsidptBEbcnyoa3OprHfgQttf9YQy3EKOeVXyQShAWm/eUxCzFQm4s",
+	"TzVft2/9wL/Tj0v9uL3zA/9BPy714/a1/qofl681gxUndrRjCVoYUP9TliEIYOEAcyLluZhmgs9JSJCF",
+	"Kz2MKEzbovdvSZwo78IMd7FQvAAhYGUIKwXho2xRa9t6BGkhsvb7GWd5e/FR4o9I6CAGKc+7FjuG2gJo",
+	"jg2FfR/8GJydBmcvghenwdnp6aetllesXJLqm1lnvOE/KHbvMkoGKbZ1cgWxXtmhDcYVygFNviEMpcQx",
+	"SlR8mpDBCLZqGvTk4d4P/KvXP2ujfa+N+ObuwQ/8n24m+s31RWNP9YJ76bor6IKZYdl1JhhBVpsLSkMs",
+	"peaSfVcwMwgfY8FzFjnsGmUoSKaIjcp93fT0+IbTR+8aBe/rxM16cwkXu5o9qbhYORmYcRbJoS+5nEKo",
+	"CW9y3TmFhQ4bCr+okXt8BSIioUeYzIgAw7nDHrhKUEwjUNAgu1mNLV5aFMYoMoQMwtKUS2ZfjDx2KchN",
+	"UqK4QLp7IOvL7h7YgJ/LfFZxUY9/SzlPpQL66JpVi1E2xGiZbVAcJT09cjpHULnAjQazfcjubjPJkNIQ",
+	"pNIjnshzujscr4wB6yw3PkqcnEWk73v12jessFdQGI0J4BGCSqYSFi6wOQdCc9He3jg0l4chdoxuD2hW",
+	"UAkqRlwyinCOLHRi5VwqnrYktVUeJE1zhrvNESiJVCWCGj9vkVOGAmZ0p3kdITUWr7hvkQ5KObiEhwzT",
+	"IWCIX4wsZRcnFOf5RSj4DBQJtYIuGEmBetfAImqd7UKEwED/UAnFYtgVhpgVof2a2AMo8G+Y1NjR/FIk",
+	"JVEZ/W/YAqUicfn3O4xISMwG74zX+IH/AUVN8wMKY2NWGh9QyByk/XSPlMT254Siwap87iXAtJtMFAJV",
+	"if6ViwVZAHWCka4CcTUgujkQlbi/IKi2PP8ucO6f+387qfPFkyJZPHmDoN4PRoM5haV7/RhZhO2Eyn8H",
+	"1AnpEiDCSSQxUnJ/ylzeJgR2kfS/xkSLhKipG5xTnO8BzVNo560vD8Xz27G8XjKw7A7j+T5n4+SjMM12",
+	"ntZhsNROULBqaDZE7+KWRAjUbWCEEUVAkQVOUx61mPvuzF0VWCArAeco279RmA7bPgUW5xAP5jCXPE3d",
+	"CLJHaT8QlnKGK4cXtDX17zGkcI858R5zsj3myJ3ndA1Pm5nUD9SPWD+ybGT++pBwQZh3IzibcxHjxky2",
+	"nyuIGBj5DSrA1BuRoZCcQZmq9r+TUBUAqP+tqoiQ4wk55FyNslEvUIwKywLCjk1cA51/95rOXbagR0+V",
+	"AKKeNpF4gyvvQoNMZdTxVRIJCQvC4qlKBF+acpvTpvarovTWQiZdiNnkxgMR9QrEo7cg2li8f57O1ZjY",
+	"moGU+owghf3uXuGtKTQNfX86We0MBxaOu3sb4tW5dlGGcBqGTAjSCKOGbc44pwjMfCW/NWGKKdZpiyAp",
+	"Ybk+kP3AfyBMm+kkBUqLoJCnfuDfgo2h17n55y3oAKly0PxccsqlHHBr+UjcriIzxI5Xj0sQdWYuB0Hk",
+	"NOQsRKZEpe5NSMGk+TVUeGR8yab1CqPQRodGP8WDaPWkNN34rLPxzsKdvTmjCudUjqnW52pUgXeJkHE2",
+	"hiBnsVxyEY2j2gsHP46ymy9Zx9h299siPJdHe3HEGNJ1kctWuJqtmVZJ12RApgvUcNfSG9pFlaDRzevh",
+	"5lZFx3UENMob/cO0iuNdMNLK3etOS7d8W7mhs8vj1L3LwJpgvFfxa5/JZf5bZahFDl2EtSrnLDPoIjst",
+	"ApDtoFXW04ZvVbpSlq/L/LjV4eqCwqozVpdCmsXxEl2WcL9RDm6mNC5HfC0EF/coM86kI7NNUUp3P7Cb",
+	"WRYDXWs0ygP9JhkynBc4aATCuaAonEd6JtCwI0kBsxsVhVwqL4EFelevf9ZY8eylx4WXkDgZX/9s0w9q",
+	"vl0bbuSE/aODyz1qBQOdhMCEuKl9Wx+2PxmPMNi9aHNeCIVzCJU5QZkCwszW33dO902if+AiTFyid0TJ",
+	"s+et5HROOTT2xfJ0Nhzx6h0FVlgNTxpsh9xjTKRCgdFHiWKiRF5lRG3xK/6IboyQSxT9XX/mCYs4nr14",
+	"udVSKgJBsYqL0eZh67CN5lWMjieCQkGAbpvVxz4KVC5dKK13xcAMDJoEncCPpzpbdOO+BYqZZXLLasXA",
+	"mlxQb9G1ag9q9dfeljBFeT27k2rlPbpN5yu+9vzshkkFxmOvYKUl906DWxMfrnku9L8fmSLUi4g5wjBy",
+	"+Fq3fZ5XoKq9rrMuPp9vuJnzBH3tp72M0O+S/2/uMGy6nRClcaXnfq+hkncp1ndIURM03TSNda7RWPUE",
+	"TIozFGA7/BV0g8YdgIqPQgkuXvs1wdP9GrPvIEZT83FXK1i80QgcKwwWuwyxniM98NycLRM0BZN3hBon",
+	"eoOoTE1qtV2EDcJBre/hmxCCqNwdqAJfhgnntFupZZ/z4Ya/0jmrwxPLPHhE+dxQqEVTr0xE6OqJdATQ",
+	"nF8AVWfmRVKcKj4NQaqn8+xhhev12tXGQoSvtAt61Z/3CNVPnbzI7SqvtGzW2KTsPHNv909316rcSs+D",
+	"bouM8BKYEiTbLrwmncEQ40ZohXs00tAaMHQMrHKMMowEzQOuCnuFfrqnfOWl28uUW2BfBtJm/S3Pevbs",
+	"2TOXMz8lFKxWdkpXYpgLolaTMMHUsvqfpXqFIGyBc2Z+vSlN7/NSWfljakKWHVcRTpTK/PXa9LHmvFdD",
+	"9q/YlfcKwke0gZ4oWzFtvV2gkHb02fPT56emQZEhg4z45/7L52fPT82mVGKYPYGMnERIUeE0LO8LG4EX",
+	"aU6HATPSA68ea8hbfd9E/rn/gUt1kRE78rIxTMsXpXrFo5VFvUwVfVzIMkpCQ+Lks7Qozha3+oZAIteJ",
+	"1VEfcWqrizD9myudTVZb8RT3rCiK2xYmpzarvjg9PYDnlmA3VfK6N7ZNc3TcfoPGKmP2PrGXXuY5pati",
+	"15GnEmxodh343x+0bzfvQbMo0TglgTGuvDlhUUMlS6ISj0TeD1tdtiQajNX+K4i8wiY9MvdCYP/oLm9F",
+	"cLaTCDbpt12scfD0kUGuEi6IxEgv/sOO8j9o8QlP0UM9qhXa/PNfWkHtF1/z6H9aayFDbO7uVYYr/U96",
+	"bjOsEIXp9ojCPDNuYzS5sSO+1UCiN/DVYsiQL5XSHXvFwRU5DI2DgoahcHSWcc7yURHq8BNTYRhx9Npx",
+	"Gx1lUgz5Vj3FbOEPd5VKwKObaS5nsVQO8hZL4ugu+7mLTpKB0mnVHCzy9vaCb1F5QKkHCyAUZtTGKOkR",
+	"5oFHiUlW2h70FrUD6SelN4b2gVZ58PWzvhhviVTlUSOPFnSgBdV99pEmZCeMtKFJ2fT8+ka0+QbAoBUV",
+	"+z+a0f5m1ErtBq2ozmdmK8+cIgNm08yXMxCQosHUmjmiif2ao20Xm+KGPZDqE0qJHIOGoHpH9qcDjXGn",
+	"3LUv+3tUuWDHDPOYYT5RhqljcO2Cw5HcBDwdyuuxpvJjL0N5uXTUsaxP6pmNpZ8qmHfqQ/3/OXdJUZie",
+	"av9K/IDJV72kffpH1Ra9M+fljA33k/s3Z52XZl1QeuiKVHkrym5p+6XWvqHV+zHH9NHJDnEyHttbme68",
+	"9FZ/9ghT3IMwLNofztzUjDwgK90klXb7YL1er7/iUTd0WWVjDugJM6vojDyxRW7l4yfBWeyVbY2Tqqnx",
+	"7RhnwwwvrGGWBshwOaY3cSkQTIGE4XJ7f+IOl0/RnDgQEd21WP2LdR3yLIKBrsMxVu8Xq7WrbK63t7xk",
+	"U8n9DpcH1ttHl6TX/++l8tAIPaq6HEcb3y/j1ua9pUzesu+NpfI7XB5aJx9fSF7/BUrclZUfC9wHWbko",
+	"4OWwkZcA1J25FvZdDjoi7hpxn/5xiLtT/Cmht0ekB9T8dyv97s+BwC1SGwPCP5qRzTs1Cahqw/iFSHPH",
+	"zGmwdu7TXxn6FoGwBv5cVBD46XKAAxOSsQD9WLQ9nmy75ihmsliUDY1cUP/cVzzifmNON6DoSIRMFXur",
+	"Wx8mQq2DHvy7/3jlzbloVHrrOQ12+jPNTX/PXoysZtijef1p/d8AAAD//5YWV6NnVQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

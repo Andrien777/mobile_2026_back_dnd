@@ -92,7 +92,7 @@ func (f *FakeAuthenticator) SignToken(t jwt.Token) ([]byte, error) {
 
 // CreateJWSWithClaims is a helper function to create JWT's with the specified
 // claims.
-func (f *FakeAuthenticator) CreateJWSWithClaims(claims []string) ([]byte, error) {
+func (f *FakeAuthenticator) CreateJWSWithClaims(claims []string, username string) ([]byte, error) {
 	t := jwt.New()
 	err := t.Set(jwt.IssuerKey, FakeIssuer)
 	if err != nil {
@@ -105,6 +105,10 @@ func (f *FakeAuthenticator) CreateJWSWithClaims(claims []string) ([]byte, error)
 	err = t.Set(PermissionsClaim, claims)
 	if err != nil {
 		return nil, fmt.Errorf("setting permissions: %w", err)
+	}
+	err = t.Set(jwt.SubjectKey, username)
+	if err != nil {
+		return nil, fmt.Errorf("setting username: %w", err)
 	}
 	return f.SignToken(t)
 }
