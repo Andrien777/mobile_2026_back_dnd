@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	dbHost := "localhost"
+	dbHost := "postgres"
 	username := "user"
 	password := "password"
 	dbName := "dnd_back"
