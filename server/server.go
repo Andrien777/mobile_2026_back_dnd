@@ -109,6 +109,10 @@ func (*Server) GetApiListCharacters(ctx context.Context, request api.GetApiListC
 	}
 	var res api.GetApiListCharacters200JSONResponse
 	for _, char := range results {
+		obj, err := model.MapInternalCharacterToObject(char)
+		if err != nil {
+			return api.GetApiListCharacters500JSONResponse{Message: err.Error()}, nil
+		}
 		res = append(res, struct {
 			Class   string `json:"class"`
 			Id      int    `json:"id"`
@@ -116,7 +120,7 @@ func (*Server) GetApiListCharacters(ctx context.Context, request api.GetApiListC
 			Name    string `json:"name"`
 			Picture string `json:"picture"`
 			Race    string `json:"race"`
-		}{Class: *char.Class[0].Name, Id: int(char.ID), Level: *char.Class[0].Level, Name: char.Name, Picture: char.Picture, Race: char.Race})
+		}{Class: *obj.Class[0].Name, Id: int(char.ID), Level: obj.Level, Name: obj.Name, Picture: obj.Picture, Race: obj.Race})
 	}
 	return res, nil
 }
@@ -135,23 +139,35 @@ func (*Server) GetApiGetCharacter(ctx context.Context, request api.GetApiGetChar
 	if temp.Owner != username {
 		return api.GetApiGetCharacter400JSONResponse{Message: "Character not public", Id: request.Params.Id}, nil
 	}
-	return api.GetApiGetCharacter200JSONResponse(temp.CharacterObject), nil
+	res := api.CharacterObject{}
+	res, err = model.MapInternalCharacterToObject(*temp)
+	if err != nil {
+		return api.GetApiGetCharacter500JSONResponse{Message: err.Error()}, nil
+	}
+	return api.GetApiGetCharacter200JSONResponse(res), nil
 }
 
 func (*Server) PostApiNewCharacter(ctx context.Context, request api.PostApiNewCharacterRequestObject) (api.PostApiNewCharacterResponseObject, error) {
 	store := writablecontext.FromContext(ctx)
 	username, _ := store.Get(auth.JWTClaimsContextKey)
-	temp := &model.InternalCharacter{}
-	temp.CharacterObject = *request.Body
+	temp, err := model.MapObjectToInternalCharacter(*request.Body)
+	if err != nil {
+		return api.PostApiNewCharacter500JSONResponse{Message: err.Error()}, nil
+	}
 	temp.Owner = username.(string)
 
-	err := model.GetDB().Table("internal_characters").Create(temp).Error
+	err = model.GetDB().Table("internal_characters").Create(&temp).Error
 	if err != nil {
 		return api.PostApiNewCharacter500JSONResponse{Message: internalErrorString}, nil
 	}
 
+	res := api.CharacterObject{}
+	res, err = model.MapInternalCharacterToObject(temp)
+	if err != nil {
+		return api.PostApiNewCharacter500JSONResponse{Message: err.Error()}, nil
+	}
 	return api.PostApiNewCharacter200JSONResponse{
-		Character: temp.CharacterObject,
+		Character: res,
 		Id:        int(temp.ID),
 	}, nil
 }
@@ -174,7 +190,12 @@ func (*Server) PostApiUpdateCharacter(ctx context.Context, request api.PostApiUp
 	if err != nil {
 		return api.PostApiUpdateCharacter500JSONResponse{Message: internalErrorString}, nil
 	}
-	return api.PostApiUpdateCharacter200JSONResponse(temp.CharacterObject), nil
+	res := api.CharacterObject{}
+	res, err = model.MapInternalCharacterToObject(*temp)
+	if err != nil {
+		return api.PostApiUpdateCharacter500JSONResponse{Message: err.Error()}, nil
+	}
+	return api.PostApiUpdateCharacter200JSONResponse(res), nil
 }
 
 func (*Server) PostApiDeleteCharacter(ctx context.Context, request api.PostApiDeleteCharacterRequestObject) (api.PostApiDeleteCharacterResponseObject, error) {
@@ -195,22 +216,26 @@ func (*Server) PostApiDeleteCharacter(ctx context.Context, request api.PostApiDe
 	if err != nil {
 		return api.PostApiDeleteCharacter500JSONResponse{Message: internalErrorString}, nil
 	}
+	res := api.CharacterObject{}
+	res, err = model.MapInternalCharacterToObject(*temp)
+	if err != nil {
+		return api.PostApiDeleteCharacter500JSONResponse{Message: err.Error()}, nil
+	}
 	return api.PostApiDeleteCharacter200JSONResponse{
-		Character: temp.CharacterObject,
+		Character: res,
 		Id:        request.Body.Id,
 	}, nil
 }
 
 func (*Server) PostApiNewSpell(ctx context.Context, request api.PostApiNewSpellRequestObject) (api.PostApiNewSpellResponseObject, error) {
-	temp := &model.InternalSpell{}
-	temp.SpellObject = *request.Body
-	err := model.GetDB().Table("internal_spells").Create(temp).Error
+	temp := model.MapObjectToInternalSpell(*request.Body)
+	err := model.GetDB().Table("internal_spells").Create(&temp).Error
 	if err != nil {
 		return api.PostApiNewSpell500JSONResponse{Message: internalErrorString}, nil
 	}
 	return api.PostApiNewSpell200JSONResponse{
 		Id:    int(temp.ID),
-		Spell: temp.SpellObject,
+		Spell: model.MapInternalSpellToObject(temp),
 	}, nil
 }
 
@@ -225,7 +250,7 @@ func (*Server) GetApiGetAllSpells(ctx context.Context, request api.GetApiGetAllS
 	}
 	res := api.GetApiGetAllSpells200JSONResponse{}
 	for _, spell := range results {
-		res = append(res, spell.SpellObject)
+		res = append(res, model.MapInternalSpellToObject(spell))
 	}
 	return res, nil
 }
@@ -245,20 +270,27 @@ func (*Server) PostApiDeleteSpell(ctx context.Context, request api.PostApiDelete
 	}
 	return api.PostApiDeleteSpell200JSONResponse{
 		Id:    request.Body.Id,
-		Spell: temp.SpellObject,
+		Spell: model.MapInternalSpellToObject(*temp),
 	}, nil
 }
 
 func (*Server) PostApiNewItem(ctx context.Context, request api.PostApiNewItemRequestObject) (api.PostApiNewItemResponseObject, error) {
-	temp := &model.InternalItem{}
-	temp.ItemObject = *request.Body
-	err := model.GetDB().Table("internal_items").Create(temp).Error
+	temp, err := model.MapObjectToInternalItem(*request.Body)
+	if err != nil {
+		return api.PostApiNewItem500JSONResponse{Message: err.Error()}, nil
+	}
+	err = model.GetDB().Table("internal_items").Create(&temp).Error
 	if err != nil {
 		return api.PostApiNewItem500JSONResponse{Message: internalErrorString}, nil
 	}
+	res := api.ItemObject{}
+	res, err = model.MapInternalItemToObject(temp)
+	if err != nil {
+		return api.PostApiNewItem500JSONResponse{Message: err.Error()}, nil
+	}
 	return api.PostApiNewItem200JSONResponse{
 		Id:   int(temp.ID),
-		Item: temp.ItemObject,
+		Item: res,
 	}, nil
 }
 
@@ -273,7 +305,11 @@ func (*Server) GetApiGetAllItems(ctx context.Context, request api.GetApiGetAllIt
 	}
 	res := api.GetApiGetAllItems200JSONResponse{}
 	for _, item := range results {
-		res = append(res, item.ItemObject)
+		temp, err := model.MapInternalItemToObject(item)
+		if err != nil {
+			return api.GetApiGetAllItems500JSONResponse{Message: err.Error()}, nil
+		}
+		res = append(res, temp)
 	}
 	return res, nil
 }
@@ -291,8 +327,13 @@ func (*Server) PostApiDeleteItem(ctx context.Context, request api.PostApiDeleteI
 	if err != nil {
 		return api.PostApiDeleteItem500JSONResponse{Message: internalErrorString}, nil
 	}
+	res := api.ItemObject{}
+	res, err = model.MapInternalItemToObject(*temp)
+	if err != nil {
+		return api.PostApiDeleteItem500JSONResponse{Message: err.Error()}, nil
+	}
 	return api.PostApiDeleteItem200JSONResponse{
 		Id:   request.Body.Id,
-		Item: temp.ItemObject,
+		Item: res,
 	}, nil
 }

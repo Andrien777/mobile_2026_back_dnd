@@ -19,14 +19,9 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
-	"github.com/lib/pq"
 	"github.com/oapi-codegen/runtime"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
-
-type CharacterObjectSavingThrowProfSlice = pq.StringArray
-
-type CharacterObjectProficienciesSlice = pq.StringArray
 
 const (
 	JwtBearerScopes = "JwtBearer.Scopes"
@@ -608,13 +603,13 @@ type CharacterObject struct {
 		Int uint `json:"int"`
 		Str uint `json:"str"`
 		Wis uint `json:"wis"`
-	} `json:"abilities" gorm:"serializer:json;type:json"`
+	} `json:"abilities"`
 	Ac                uint                     `json:"ac"`
 	Age               string                   `json:"age"`
 	Alignment         CharacterObjectAlignment `json:"alignment"`
 	Allies            string                   `json:"allies"`
 	Appearance        string                   `json:"appearance"`
-	ArmourProficiency pq.StringArray           `json:"armour_proficiency" gorm:"type:text[]"`
+	ArmourProficiency []string                 `json:"armour_proficiency"`
 	Attacks           []struct {
 		Damage struct {
 			Bonus uint `json:"bonus"`
@@ -623,8 +618,8 @@ type CharacterObject struct {
 				Value  CharacterObjectAttacksDamageDiceValue `json:"value"`
 			} `json:"dice"`
 		} `json:"damage"`
-		Name  string         `json:"name"`
-		Notes pq.StringArray `json:"notes" gorm:"type:text[]"`
+		Name  string   `json:"name"`
+		Notes []string `json:"notes"`
 		ToHit struct {
 			Ability CharacterObjectAttacksToHitAbility `json:"ability"`
 			Bonus   uint                               `json:"bonus"`
@@ -654,26 +649,26 @@ type CharacterObject struct {
 		} `json:"features"`
 		Name string `json:"name"`
 	} `json:"class_features"`
-	Conditions pq.StringArray `json:"conditions" gorm:"type:text[]"`
+	Conditions []string `json:"conditions"`
 	DeathSaves struct {
 		Failure uint `json:"failure"`
 		Success uint `json:"success"`
 	} `json:"death_saves"`
 	Defences struct {
-		Custom     pq.StringArray `json:"custom" gorm:"type:text[]"`
-		Immune     pq.StringArray `json:"immune" gorm:"type:text[]"`
-		Resistance pq.StringArray `json:"resistance" gorm:"type:text[]"`
-		Vulnerable pq.StringArray `json:"vulnerable" gorm:"type:text[]"`
+		Custom     []string `json:"custom"`
+		Immune     []string `json:"immune"`
+		Resistance []string `json:"resistance"`
+		Vulnerable []string `json:"vulnerable"`
 	} `json:"defences"`
-	Enemies    string                            `json:"enemies"`
-	Expertises CharacterObjectProficienciesSlice `json:"expertises" gorm:"type:text[]"`
-	Eyes       string                            `json:"eyes"`
-	Faith      string                            `json:"faith"`
-	Feats      []FeatObject                      `json:"feats"`
-	Flaws      string                            `json:"flaws"`
-	Gender     string                            `json:"gender"`
-	Hair       string                            `json:"hair"`
-	Height     string                            `json:"height"`
+	Enemies    string                      `json:"enemies"`
+	Expertises []CharacterObjectExpertises `json:"expertises"`
+	Eyes       string                      `json:"eyes"`
+	Faith      string                      `json:"faith"`
+	Feats      []FeatObject                `json:"feats"`
+	Flaws      string                      `json:"flaws"`
+	Gender     string                      `json:"gender"`
+	Hair       string                      `json:"hair"`
+	Height     string                      `json:"height"`
 	Hp         struct {
 		Current uint `json:"current"`
 		HitDice struct {
@@ -684,11 +679,11 @@ type CharacterObject struct {
 		Max  uint `json:"max"`
 		Temp uint `json:"temp"`
 	} `json:"hp"`
-	Ideals        string         `json:"ideals"`
-	InitiativeMod int            `json:"initiative_mod"`
-	Inventory     []ItemObject   `json:"inventory"`
-	Languages     pq.StringArray `json:"languages" gorm:"type:text[]"`
-	Level         uint           `json:"level"`
+	Ideals        string       `json:"ideals"`
+	InitiativeMod int          `json:"initiative_mod"`
+	Inventory     []ItemObject `json:"inventory"`
+	Languages     []string     `json:"languages"`
+	Level         uint         `json:"level"`
 	Money         struct {
 		Cp uint `json:"cp"`
 		Ep uint `json:"ep"`
@@ -696,24 +691,24 @@ type CharacterObject struct {
 		Pp uint `json:"pp"`
 		Sp uint `json:"sp"`
 	} `json:"money"`
-	Name           string                            `json:"name"`
-	Notes          string                            `json:"notes"`
-	Organizations  string                            `json:"organizations"`
-	Personality    string                            `json:"personality"`
-	Picture        string                            `json:"picture"`
-	Proficiencies  CharacterObjectProficienciesSlice `json:"proficiencies" gorm:"type:text[]"`
-	ProficiencyMod uint                              `json:"proficiency_mod"`
-	Race           string                            `json:"race"`
+	Name           string                         `json:"name"`
+	Notes          string                         `json:"notes"`
+	Organizations  string                         `json:"organizations"`
+	Personality    string                         `json:"personality"`
+	Picture        string                         `json:"picture"`
+	Proficiencies  []CharacterObjectProficiencies `json:"proficiencies"`
+	ProficiencyMod uint                           `json:"proficiency_mod"`
+	Race           string                         `json:"race"`
 	RaceTraits     []struct {
 		Description string `json:"description"`
 		Name        string `json:"name"`
 	} `json:"race_traits"`
-	SavingThrowProf CharacterObjectSavingThrowProfSlice `json:"saving_throw_prof" gorm:"type:text[]"`
+	SavingThrowProf []CharacterObjectSavingThrowProf `json:"saving_throw_prof"`
 	Senses          struct {
-		Other                pq.StringArray `json:"other" gorm:"type:text[]"`
-		PassiveInsight       uint           `json:"passive_insight"`
-		PassiveInvestigation uint           `json:"passive_investigation"`
-		PassivePerception    uint           `json:"passive_perception"`
+		Other                []string `json:"other"`
+		PassiveInsight       uint     `json:"passive_insight"`
+		PassiveInvestigation uint     `json:"passive_investigation"`
+		PassivePerception    uint     `json:"passive_perception"`
 	} `json:"senses"`
 	Shielded bool                `json:"shielded"`
 	Size     CharacterObjectSize `json:"size"`
@@ -724,10 +719,10 @@ type CharacterObject struct {
 		KnownSpells          []SpellObject `json:"known_spells"`
 		ReadySpells          []SpellObject `json:"ready_spells"`
 	} `json:"spells"`
-	ToolsProficiency  pq.StringArray `json:"tools_proficiency" gorm:"type:text[]"`
-	WeaponProficiency pq.StringArray `json:"weapon_proficiency" gorm:"type:text[]"`
-	Weight            uint           `json:"weight"`
-	Xp                uint           `json:"xp"`
+	ToolsProficiency  []string `json:"tools_proficiency"`
+	WeaponProficiency []string `json:"weapon_proficiency"`
+	Weight            uint     `json:"weight"`
+	Xp                uint     `json:"xp"`
 }
 
 // CharacterObjectAlignment defines model for CharacterObject.Alignment.
@@ -769,7 +764,7 @@ type FeatObject struct {
 // ItemObject defines model for ItemObject.
 type ItemObject struct {
 	Cost     uint                   `json:"cost"`
-	Data     map[string]interface{} `json:"data" gorm:"type:json"`
+	Data     map[string]interface{} `json:"data"`
 	ItemType ItemObjectItemType     `json:"item_type"`
 	Name     string                 `json:"name"`
 	Weight   float32                `json:"weight"`
@@ -1046,7 +1041,7 @@ func (siw *ServerInterfaceWrapper) PostApiDeleteCharacter(w http.ResponseWriter,
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1066,7 +1061,7 @@ func (siw *ServerInterfaceWrapper) PostApiDeleteItem(w http.ResponseWriter, r *h
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1086,7 +1081,7 @@ func (siw *ServerInterfaceWrapper) PostApiDeleteSpell(w http.ResponseWriter, r *
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1106,7 +1101,7 @@ func (siw *ServerInterfaceWrapper) GetApiGetAllItems(w http.ResponseWriter, r *h
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1126,7 +1121,7 @@ func (siw *ServerInterfaceWrapper) GetApiGetAllSpells(w http.ResponseWriter, r *
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1148,7 +1143,7 @@ func (siw *ServerInterfaceWrapper) GetApiGetCharacter(w http.ResponseWriter, r *
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1186,7 +1181,7 @@ func (siw *ServerInterfaceWrapper) GetApiListCharacters(w http.ResponseWriter, r
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1220,7 +1215,7 @@ func (siw *ServerInterfaceWrapper) PostApiNewCharacter(w http.ResponseWriter, r 
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1240,7 +1235,7 @@ func (siw *ServerInterfaceWrapper) PostApiNewItem(w http.ResponseWriter, r *http
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1260,7 +1255,7 @@ func (siw *ServerInterfaceWrapper) PostApiNewSpell(w http.ResponseWriter, r *htt
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -1294,7 +1289,7 @@ func (siw *ServerInterfaceWrapper) PostApiUpdateCharacter(w http.ResponseWriter,
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, JwtBearerScopes, pq.StringArray{"auth"})
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
 
 	r = r.WithContext(ctx)
 
@@ -2479,7 +2474,7 @@ func (sh *strictHandler) PostApiUpdateCharacter(w http.ResponseWriter, r *http.R
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
-var swaggerSpec = pq.StringArray{
+var swaggerSpec = []string{
 
 	"H4sIAAAAAAAC/+xbb2/bOJP/KoLugAMKbZO0u3d7eZcmbZMHaVrEKXaBRWGMpbHEhiK1JGXXu/B3f0BS",
 	"/0XZsp1uu8/6jeNI5HBmODP8zQz9px/yNOMMmZL++Z++DBNMwXy9TEBAqFC8n33GUOlHmeAZCkXQDIAZ",
