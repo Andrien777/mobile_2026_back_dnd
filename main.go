@@ -18,21 +18,17 @@ func main() {
 
 	r := chi.NewRouter()
 
-	// Create a fake authenticator. This allows us to issue tokens, and also
-	// implements a validator to check their validity.
 	fa, err := auth.NewFakeAuthenticator()
 	if err != nil {
 		log.Fatalln("error creating authenticator:", err)
 	}
 
-	// Create middleware for validating tokens.
 	mw, err := auth.CreateMiddleware(fa)
 	if err != nil {
 		log.Fatalln("error creating middleware:", err)
 	}
 
 	h := api.HandlerFromMux(api.NewStrictHandler(new(server.NewServer()), []api.StrictMiddlewareFunc{}), r)
-	// wrap the existing handler with our global middleware
 	h = mw(h)
 	h = writablecontext.Middleware(h)
 
