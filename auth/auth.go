@@ -11,14 +11,6 @@ import (
 	"github.com/oapi-codegen/oapi-codegen/v2/pkg/ecdsafile"
 )
 
-// PrivateKey is an ECDSA private key which was generated with the following
-// command:
-//
-//	openssl ecparam -name prime256v1 -genkey -noout -out ecprivatekey.pem
-//
-// We are using a hard coded key here in this example, but in real applications,
-// you would never do this. Your JWT signing key must never be in your application,
-// only the public key.
 const PrivateKey = `-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEIN2dALnjdcZaIZg4QuA6Dw+kxiSW502kJfmBN3priIhPoAoGCCqGSM49
 AwEHoUQDQgAE4pPyvrB9ghqkT1Llk0A42lixkugFd/TBdOp6wf69O9Nndnp4+HcR
@@ -37,8 +29,6 @@ type FakeAuthenticator struct {
 
 var _ JWSValidator = (*FakeAuthenticator)(nil)
 
-// NewFakeAuthenticator creates an authenticator example which uses a hard coded
-// ECDSA key to validate JWT's that it has signed itself.
 func NewFakeAuthenticator() (*FakeAuthenticator, error) {
 	privKey, err := ecdsafile.LoadEcdsaPrivateKey([]byte(PrivateKey))
 	if err != nil {
@@ -68,14 +58,11 @@ func NewFakeAuthenticator() (*FakeAuthenticator, error) {
 	return &FakeAuthenticator{PrivateKey: privKey, KeySet: set}, nil
 }
 
-// ValidateJWS ensures that the critical JWT claims needed to ensure that we
-// trust the JWT are present and with the correct values.
 func (f *FakeAuthenticator) ValidateJWS(jwsString string) (jwt.Token, error) {
 	return jwt.Parse([]byte(jwsString), jwt.WithKeySet(f.KeySet),
 		jwt.WithAudience(FakeAudience), jwt.WithIssuer(FakeIssuer))
 }
 
-// SignToken takes a JWT and signs it with our private key, returning a JWS.
 func (f *FakeAuthenticator) SignToken(t jwt.Token) ([]byte, error) {
 	hdr := jws.NewHeaders()
 	if err := hdr.Set(jws.AlgorithmKey, jwa.ES256); err != nil {
@@ -90,8 +77,6 @@ func (f *FakeAuthenticator) SignToken(t jwt.Token) ([]byte, error) {
 	return jwt.Sign(t, jwa.ES256, f.PrivateKey, jwt.WithHeaders(hdr))
 }
 
-// CreateJWSWithClaims is a helper function to create JWT's with the specified
-// claims.
 func (f *FakeAuthenticator) CreateJWSWithClaims(claims []string, username string) ([]byte, error) {
 	t := jwt.New()
 	err := t.Set(jwt.IssuerKey, FakeIssuer)
