@@ -87,20 +87,16 @@ type InternalCharacter struct {
 	Race            string
 	RaceTraitsJson  []byte
 	SavingThrowProf pq.StringArray `gorm:"type:text[]"`
-	Senses          struct {
-		Other                pq.StringArray `gorm:"type:text[]"`
-		PassiveInsight       uint
-		PassiveInvestigation uint
-		PassivePerception    uint
-	} `gorm:"embedded;embedded_prefix:senses_"`
-	Shielded bool
-	Size     string
-	Skin     string
-	Speed    uint
-	Spells   struct {
+	Senses          pq.StringArray `gorm:"type:text[]"`
+	Shielded        bool
+	Size            string
+	Skin            string
+	Speed           uint
+	Spells          struct {
 		CurrentConcentrationJson []byte
 		KnownSpellsJson          []byte
 		ReadySpellsJson          []byte
+		SlotsJson                []byte
 	} `gorm:"embedded;embedded_prefix:spells_"`
 	ToolsProficiency  pq.StringArray `gorm:"type:text[]"`
 	WeaponProficiency pq.StringArray `gorm:"type:text[]"`
@@ -125,7 +121,7 @@ func MapInternalCharacterToObject(internal InternalCharacter) (api.CharacterObje
 	result.Allies = internal.Allies
 	result.Appearance = internal.Appearance
 	result.ArmourProficiency = internal.ArmourProficiency
-	err := json.Unmarshal([]byte(internal.AttacksJson), &result.Attacks)
+	err := json.Unmarshal(internal.AttacksJson, &result.Attacks)
 	if err != nil {
 		return result, err
 	}
@@ -135,16 +131,16 @@ func MapInternalCharacterToObject(internal InternalCharacter) (api.CharacterObje
 	}(internal.Background)
 	result.Backstory = internal.Backstory
 	result.Bonds = internal.Bonds
-	err = json.Unmarshal([]byte(internal.BonusActionsJson), &result.BonusActions)
+	err = json.Unmarshal(internal.BonusActionsJson, &result.BonusActions)
 	if err != nil {
 		return result, err
 	}
 	result.Capacity = internal.Capacity
-	err = json.Unmarshal([]byte(internal.ClassJson), &result.Class)
+	err = json.Unmarshal(internal.ClassJson, &result.Class)
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal([]byte(internal.ClassFeaturesJson), &result.ClassFeatures)
+	err = json.Unmarshal(internal.ClassFeaturesJson, &result.ClassFeatures)
 	if err != nil {
 		return result, err
 	}
@@ -163,7 +159,7 @@ func MapInternalCharacterToObject(internal InternalCharacter) (api.CharacterObje
 	}
 	result.Eyes = internal.Eyes
 	result.Faith = internal.Faith
-	err = json.Unmarshal([]byte(internal.FeatsJson), &result.Feats)
+	err = json.Unmarshal(internal.FeatsJson, &result.Feats)
 	if err != nil {
 		return result, err
 	}
@@ -179,7 +175,7 @@ func MapInternalCharacterToObject(internal InternalCharacter) (api.CharacterObje
 	result.Hp.HitDice.Value = api.CharacterObjectHpHitDiceValue(internal.Hp.HitDice.Value)
 	result.Ideals = internal.Ideals
 	result.InitiativeMod = internal.InitiativeMod
-	err = json.Unmarshal([]byte(internal.InventoryJson), &result.Inventory)
+	err = json.Unmarshal(internal.InventoryJson, &result.Inventory)
 	if err != nil {
 		return result, err
 	}
@@ -203,7 +199,7 @@ func MapInternalCharacterToObject(internal InternalCharacter) (api.CharacterObje
 	}
 	result.ProficiencyMod = internal.ProficiencyMod
 	result.Race = internal.Race
-	err = json.Unmarshal([]byte(internal.RaceTraitsJson), &result.RaceTraits)
+	err = json.Unmarshal(internal.RaceTraitsJson, &result.RaceTraits)
 	if err != nil {
 		return result, err
 	}
@@ -211,23 +207,24 @@ func MapInternalCharacterToObject(internal InternalCharacter) (api.CharacterObje
 	for _, prof := range internal.SavingThrowProf {
 		result.SavingThrowProf = append(result.SavingThrowProf, api.CharacterObjectSavingThrowProf(prof))
 	}
-	result.Senses.Other = internal.Senses.Other
-	result.Senses.PassiveInvestigation = internal.Senses.PassiveInvestigation
-	result.Senses.PassiveInsight = internal.Senses.PassiveInsight
-	result.Senses.PassivePerception = internal.Senses.PassivePerception
+	result.Senses = internal.Senses
 	result.Shielded = internal.Shielded
 	result.Size = api.CharacterObjectSize(internal.Size)
 	result.Skin = internal.Skin
 	result.Speed = internal.Speed
-	err = json.Unmarshal([]byte(internal.Spells.CurrentConcentrationJson), &result.Spells.CurrentConcentration)
+	err = json.Unmarshal(internal.Spells.CurrentConcentrationJson, &result.Spells.CurrentConcentration)
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal([]byte(internal.Spells.KnownSpellsJson), &result.Spells.KnownSpells)
+	err = json.Unmarshal(internal.Spells.KnownSpellsJson, &result.Spells.KnownSpells)
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal([]byte(internal.Spells.ReadySpellsJson), &result.Spells.ReadySpells)
+	err = json.Unmarshal(internal.Spells.ReadySpellsJson, &result.Spells.ReadySpells)
+	if err != nil {
+		return result, err
+	}
+	err = json.Unmarshal(internal.Spells.SlotsJson, &result.Spells.Slots)
 	if err != nil {
 		return result, err
 	}
@@ -341,10 +338,7 @@ func MapObjectToInternalCharacter(object api.CharacterObject) (InternalCharacter
 	for _, prof := range object.SavingThrowProf {
 		result.SavingThrowProf = append(result.SavingThrowProf, string(prof))
 	}
-	result.Senses.Other = object.Senses.Other
-	result.Senses.PassiveInvestigation = object.Senses.PassiveInvestigation
-	result.Senses.PassiveInsight = object.Senses.PassiveInsight
-	result.Senses.PassivePerception = object.Senses.PassivePerception
+	result.Senses = object.Senses
 	result.Shielded = object.Shielded
 	result.Size = string(object.Size)
 	result.Skin = object.Skin
@@ -358,6 +352,10 @@ func MapObjectToInternalCharacter(object api.CharacterObject) (InternalCharacter
 		return result, err
 	}
 	result.Spells.ReadySpellsJson, err = json.Marshal(object.Spells.ReadySpells)
+	if err != nil {
+		return result, err
+	}
+	result.Spells.SlotsJson, err = json.Marshal(object.Spells.Slots)
 	if err != nil {
 		return result, err
 	}

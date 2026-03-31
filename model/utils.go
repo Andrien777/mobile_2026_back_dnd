@@ -171,3 +171,8 @@ func MapObjectToInternalItem(object api.ItemObject) (InternalItem, error) {
 	}
 	return result, nil
 }
+
+type InternalFeat struct {
+	ID uint `gorm:"primary_key"`
+	api.FeatObject
+}

@@ -704,20 +704,20 @@ type CharacterObject struct {
 		Name        string `json:"name"`
 	} `json:"race_traits"`
 	SavingThrowProf []CharacterObjectSavingThrowProf `json:"saving_throw_prof"`
-	Senses          struct {
-		Other                []string `json:"other"`
-		PassiveInsight       uint     `json:"passive_insight"`
-		PassiveInvestigation uint     `json:"passive_investigation"`
-		PassivePerception    uint     `json:"passive_perception"`
-	} `json:"senses"`
-	Shielded bool                `json:"shielded"`
-	Size     CharacterObjectSize `json:"size"`
-	Skin     string              `json:"skin"`
-	Speed    uint                `json:"speed"`
-	Spells   struct {
+	Senses          []string                         `json:"senses"`
+	Shielded        bool                             `json:"shielded"`
+	Size            CharacterObjectSize              `json:"size"`
+	Skin            string                           `json:"skin"`
+	Speed           uint                             `json:"speed"`
+	Spells          struct {
 		CurrentConcentration SpellObject   `json:"current_concentration"`
 		KnownSpells          []SpellObject `json:"known_spells"`
 		ReadySpells          []SpellObject `json:"ready_spells"`
+		Slots                []struct {
+			Left  uint `json:"left"`
+			Level uint `json:"level"`
+			Max   uint `json:"max"`
+		} `json:"slots"`
 	} `json:"spells"`
 	ToolsProficiency  []string `json:"tools_proficiency"`
 	WeaponProficiency []string `json:"weapon_proficiency"`
@@ -867,6 +867,11 @@ type PostApiDeleteCharacterJSONBody struct {
 	Id int `json:"id"`
 }
 
+// PostApiDeleteFeatJSONBody defines parameters for PostApiDeleteFeat.
+type PostApiDeleteFeatJSONBody struct {
+	Id int `json:"id"`
+}
+
 // PostApiDeleteItemJSONBody defines parameters for PostApiDeleteItem.
 type PostApiDeleteItemJSONBody struct {
 	Id int `json:"id"`
@@ -891,6 +896,9 @@ type PostApiUpdateCharacterJSONBody struct {
 // PostApiDeleteCharacterJSONRequestBody defines body for PostApiDeleteCharacter for application/json ContentType.
 type PostApiDeleteCharacterJSONRequestBody PostApiDeleteCharacterJSONBody
 
+// PostApiDeleteFeatJSONRequestBody defines body for PostApiDeleteFeat for application/json ContentType.
+type PostApiDeleteFeatJSONRequestBody PostApiDeleteFeatJSONBody
+
 // PostApiDeleteItemJSONRequestBody defines body for PostApiDeleteItem for application/json ContentType.
 type PostApiDeleteItemJSONRequestBody PostApiDeleteItemJSONBody
 
@@ -902,6 +910,9 @@ type PostApiLoginJSONRequestBody = UserStructure
 
 // PostApiNewCharacterJSONRequestBody defines body for PostApiNewCharacter for application/json ContentType.
 type PostApiNewCharacterJSONRequestBody = CharacterObject
+
+// PostApiNewFeatJSONRequestBody defines body for PostApiNewFeat for application/json ContentType.
+type PostApiNewFeatJSONRequestBody = FeatObject
 
 // PostApiNewItemJSONRequestBody defines body for PostApiNewItem for application/json ContentType.
 type PostApiNewItemJSONRequestBody = ItemObject
@@ -921,11 +932,17 @@ type ServerInterface interface {
 	// (POST /api/delete_character)
 	PostApiDeleteCharacter(w http.ResponseWriter, r *http.Request)
 
+	// (POST /api/delete_feat)
+	PostApiDeleteFeat(w http.ResponseWriter, r *http.Request)
+
 	// (POST /api/delete_item)
 	PostApiDeleteItem(w http.ResponseWriter, r *http.Request)
 
 	// (POST /api/delete_spell)
 	PostApiDeleteSpell(w http.ResponseWriter, r *http.Request)
+
+	// (GET /api/get_all_feats)
+	GetApiGetAllFeats(w http.ResponseWriter, r *http.Request)
 
 	// (GET /api/get_all_items)
 	GetApiGetAllItems(w http.ResponseWriter, r *http.Request)
@@ -944,6 +961,9 @@ type ServerInterface interface {
 
 	// (POST /api/new_character)
 	PostApiNewCharacter(w http.ResponseWriter, r *http.Request)
+
+	// (POST /api/new_feat)
+	PostApiNewFeat(w http.ResponseWriter, r *http.Request)
 
 	// (POST /api/new_item)
 	PostApiNewItem(w http.ResponseWriter, r *http.Request)
@@ -967,6 +987,11 @@ func (_ Unimplemented) PostApiDeleteCharacter(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// (POST /api/delete_feat)
+func (_ Unimplemented) PostApiDeleteFeat(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // (POST /api/delete_item)
 func (_ Unimplemented) PostApiDeleteItem(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
@@ -974,6 +999,11 @@ func (_ Unimplemented) PostApiDeleteItem(w http.ResponseWriter, r *http.Request)
 
 // (POST /api/delete_spell)
 func (_ Unimplemented) PostApiDeleteSpell(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/get_all_feats)
+func (_ Unimplemented) GetApiGetAllFeats(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1004,6 +1034,11 @@ func (_ Unimplemented) PostApiLogin(w http.ResponseWriter, r *http.Request) {
 
 // (POST /api/new_character)
 func (_ Unimplemented) PostApiNewCharacter(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (POST /api/new_feat)
+func (_ Unimplemented) PostApiNewFeat(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1056,6 +1091,26 @@ func (siw *ServerInterfaceWrapper) PostApiDeleteCharacter(w http.ResponseWriter,
 	handler.ServeHTTP(w, r)
 }
 
+// PostApiDeleteFeat operation middleware
+func (siw *ServerInterfaceWrapper) PostApiDeleteFeat(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostApiDeleteFeat(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // PostApiDeleteItem operation middleware
 func (siw *ServerInterfaceWrapper) PostApiDeleteItem(w http.ResponseWriter, r *http.Request) {
 
@@ -1087,6 +1142,26 @@ func (siw *ServerInterfaceWrapper) PostApiDeleteSpell(w http.ResponseWriter, r *
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PostApiDeleteSpell(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetApiGetAllFeats operation middleware
+func (siw *ServerInterfaceWrapper) GetApiGetAllFeats(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetApiGetAllFeats(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1221,6 +1296,26 @@ func (siw *ServerInterfaceWrapper) PostApiNewCharacter(w http.ResponseWriter, r 
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PostApiNewCharacter(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostApiNewFeat operation middleware
+func (siw *ServerInterfaceWrapper) PostApiNewFeat(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostApiNewFeat(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1421,10 +1516,16 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/api/delete_character", wrapper.PostApiDeleteCharacter)
 	})
 	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/delete_feat", wrapper.PostApiDeleteFeat)
+	})
+	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/delete_item", wrapper.PostApiDeleteItem)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/delete_spell", wrapper.PostApiDeleteSpell)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/get_all_feats", wrapper.GetApiGetAllFeats)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/api/get_all_items", wrapper.GetApiGetAllItems)
@@ -1443,6 +1544,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/new_character", wrapper.PostApiNewCharacter)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/new_feat", wrapper.PostApiNewFeat)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/new_item", wrapper.PostApiNewItem)
@@ -1504,6 +1608,56 @@ func (response PostApiDeleteCharacter401JSONResponse) VisitPostApiDeleteCharacte
 type PostApiDeleteCharacter500JSONResponse ErrorResponse
 
 func (response PostApiDeleteCharacter500JSONResponse) VisitPostApiDeleteCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiDeleteFeatRequestObject struct {
+	Body *PostApiDeleteFeatJSONRequestBody
+}
+
+type PostApiDeleteFeatResponseObject interface {
+	VisitPostApiDeleteFeatResponse(w http.ResponseWriter) error
+}
+
+type PostApiDeleteFeat200JSONResponse struct {
+	Feat FeatObject `json:"feat"`
+	Id   int        `json:"id"`
+}
+
+func (response PostApiDeleteFeat200JSONResponse) VisitPostApiDeleteFeatResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiDeleteFeat400JSONResponse struct {
+	Id      int    `json:"id"`
+	Message string `json:"message"`
+}
+
+func (response PostApiDeleteFeat400JSONResponse) VisitPostApiDeleteFeatResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiDeleteFeat401JSONResponse ErrorResponse
+
+func (response PostApiDeleteFeat401JSONResponse) VisitPostApiDeleteFeatResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiDeleteFeat500JSONResponse ErrorResponse
+
+func (response PostApiDeleteFeat500JSONResponse) VisitPostApiDeleteFeatResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -1604,6 +1758,40 @@ func (response PostApiDeleteSpell401JSONResponse) VisitPostApiDeleteSpellRespons
 type PostApiDeleteSpell500JSONResponse ErrorResponse
 
 func (response PostApiDeleteSpell500JSONResponse) VisitPostApiDeleteSpellResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetApiGetAllFeatsRequestObject struct {
+}
+
+type GetApiGetAllFeatsResponseObject interface {
+	VisitGetApiGetAllFeatsResponse(w http.ResponseWriter) error
+}
+
+type GetApiGetAllFeats200JSONResponse []FeatObject
+
+func (response GetApiGetAllFeats200JSONResponse) VisitGetApiGetAllFeatsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetApiGetAllFeats401JSONResponse ErrorResponse
+
+func (response GetApiGetAllFeats401JSONResponse) VisitGetApiGetAllFeatsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetApiGetAllFeats500JSONResponse ErrorResponse
+
+func (response GetApiGetAllFeats500JSONResponse) VisitGetApiGetAllFeatsResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(500)
 
@@ -1839,6 +2027,44 @@ func (response PostApiNewCharacter500JSONResponse) VisitPostApiNewCharacterRespo
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PostApiNewFeatRequestObject struct {
+	Body *PostApiNewFeatJSONRequestBody
+}
+
+type PostApiNewFeatResponseObject interface {
+	VisitPostApiNewFeatResponse(w http.ResponseWriter) error
+}
+
+type PostApiNewFeat200JSONResponse struct {
+	Feat FeatObject `json:"feat"`
+	Id   int        `json:"id"`
+}
+
+func (response PostApiNewFeat200JSONResponse) VisitPostApiNewFeatResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiNewFeat401JSONResponse ErrorResponse
+
+func (response PostApiNewFeat401JSONResponse) VisitPostApiNewFeatResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiNewFeat500JSONResponse ErrorResponse
+
+func (response PostApiNewFeat500JSONResponse) VisitPostApiNewFeatResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PostApiNewItemRequestObject struct {
 	Body *PostApiNewItemJSONRequestBody
 }
@@ -2003,11 +2229,17 @@ type StrictServerInterface interface {
 	// (POST /api/delete_character)
 	PostApiDeleteCharacter(ctx context.Context, request PostApiDeleteCharacterRequestObject) (PostApiDeleteCharacterResponseObject, error)
 
+	// (POST /api/delete_feat)
+	PostApiDeleteFeat(ctx context.Context, request PostApiDeleteFeatRequestObject) (PostApiDeleteFeatResponseObject, error)
+
 	// (POST /api/delete_item)
 	PostApiDeleteItem(ctx context.Context, request PostApiDeleteItemRequestObject) (PostApiDeleteItemResponseObject, error)
 
 	// (POST /api/delete_spell)
 	PostApiDeleteSpell(ctx context.Context, request PostApiDeleteSpellRequestObject) (PostApiDeleteSpellResponseObject, error)
+
+	// (GET /api/get_all_feats)
+	GetApiGetAllFeats(ctx context.Context, request GetApiGetAllFeatsRequestObject) (GetApiGetAllFeatsResponseObject, error)
 
 	// (GET /api/get_all_items)
 	GetApiGetAllItems(ctx context.Context, request GetApiGetAllItemsRequestObject) (GetApiGetAllItemsResponseObject, error)
@@ -2026,6 +2258,9 @@ type StrictServerInterface interface {
 
 	// (POST /api/new_character)
 	PostApiNewCharacter(ctx context.Context, request PostApiNewCharacterRequestObject) (PostApiNewCharacterResponseObject, error)
+
+	// (POST /api/new_feat)
+	PostApiNewFeat(ctx context.Context, request PostApiNewFeatRequestObject) (PostApiNewFeatResponseObject, error)
 
 	// (POST /api/new_item)
 	PostApiNewItem(ctx context.Context, request PostApiNewItemRequestObject) (PostApiNewItemResponseObject, error)
@@ -2103,6 +2338,40 @@ func (sh *strictHandler) PostApiDeleteCharacter(w http.ResponseWriter, r *http.R
 	}
 }
 
+// PostApiDeleteFeat operation middleware
+func (sh *strictHandler) PostApiDeleteFeat(w http.ResponseWriter, r *http.Request) {
+	var request PostApiDeleteFeatRequestObject
+
+	var body PostApiDeleteFeatJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		if !errors.Is(err, io.EOF) {
+			sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+			return
+		}
+	} else {
+		request.Body = &body
+	}
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostApiDeleteFeat(ctx, request.(PostApiDeleteFeatRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostApiDeleteFeat")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostApiDeleteFeatResponseObject); ok {
+		if err := validResponse.VisitPostApiDeleteFeatResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // PostApiDeleteItem operation middleware
 func (sh *strictHandler) PostApiDeleteItem(w http.ResponseWriter, r *http.Request) {
 	var request PostApiDeleteItemRequestObject
@@ -2164,6 +2433,30 @@ func (sh *strictHandler) PostApiDeleteSpell(w http.ResponseWriter, r *http.Reque
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(PostApiDeleteSpellResponseObject); ok {
 		if err := validResponse.VisitPostApiDeleteSpellResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetApiGetAllFeats operation middleware
+func (sh *strictHandler) GetApiGetAllFeats(w http.ResponseWriter, r *http.Request) {
+	var request GetApiGetAllFeatsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetApiGetAllFeats(ctx, request.(GetApiGetAllFeatsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetApiGetAllFeats")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetApiGetAllFeatsResponseObject); ok {
+		if err := validResponse.VisitGetApiGetAllFeatsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -2337,6 +2630,40 @@ func (sh *strictHandler) PostApiNewCharacter(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+// PostApiNewFeat operation middleware
+func (sh *strictHandler) PostApiNewFeat(w http.ResponseWriter, r *http.Request) {
+	var request PostApiNewFeatRequestObject
+
+	var body PostApiNewFeatJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		if !errors.Is(err, io.EOF) {
+			sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+			return
+		}
+	} else {
+		request.Body = &body
+	}
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostApiNewFeat(ctx, request.(PostApiNewFeatRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostApiNewFeat")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostApiNewFeatResponseObject); ok {
+		if err := validResponse.VisitPostApiNewFeatResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // PostApiNewItem operation middleware
 func (sh *strictHandler) PostApiNewItem(w http.ResponseWriter, r *http.Request) {
 	var request PostApiNewItemRequestObject
@@ -2476,62 +2803,64 @@ func (sh *strictHandler) PostApiUpdateCharacter(w http.ResponseWriter, r *http.R
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"7MXYaoY9ptef1v8OAAD//+PhzPdnVwAA",
+	"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",
+	"3wEAAP//m+tWoWlgAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

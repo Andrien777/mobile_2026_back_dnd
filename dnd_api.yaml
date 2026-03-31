@@ -548,30 +548,10 @@ components:
           format: uint
           example: 3
         senses:
-          type: object
-          required:
-            - passive_insight
-            - passive_investigation
-            - passive_perception
-            - other
-          properties:
-            passive_perception:
-              type: integer
-              format: uint
-              example: 10
-            passive_investigation:
-              type: integer
-              format: uint
-              example: 10
-            passive_insight:
-              type: integer
-              format: uint
-              example: 10
-            other:
-              type: array
-              items:
-                type: string
-                example: "Dark vision 60ft"
+          type: array
+          items:
+            type: string
+            example: "Dark vision 60ft"
         proficiencies:
           type: array
           items:
@@ -706,6 +686,7 @@ components:
             - current_concentration
             - ready_spells
             - known_spells
+            - slots
           properties:
             current_concentration:
               $ref: "#/components/schemas/SpellObject"
@@ -717,6 +698,27 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/SpellObject"
+            slots:
+              type: array
+              items:
+                type: object
+                required:
+                  - level
+                  - max
+                  - left
+                properties:
+                  level:
+                    type: integer
+                    format: uint
+                    example: 1
+                  max:
+                    type: integer
+                    format: uint
+                    example: 2
+                  left:
+                    type: integer
+                    format: uint
+                    example: 0
         armour_proficiency:
           type: array
           items:
@@ -882,6 +884,130 @@ tags:
   - name: Utils
     description: Other paths
 paths:
+  /api/new_feat:
+    post:
+      description: Create a new feat
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [ Utils ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FeatObject"
+      responses:
+        200:
+          description: Successfully created a feat
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - feat
+                properties:
+                  id:
+                    type: integer
+                  feat:
+                    $ref: "#/components/schemas/FeatObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/get_all_feats:
+    get:
+      description: Get all available feats in a list
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [ Utils ]
+      responses:
+        200:
+          description: List of feats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FeatObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/delete_feat:
+    post:
+      description: Delete a feat
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [ Utils ]
+      requestBody:
+        description: ID of feat to delete
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+      responses:
+        200:
+          description: Successfully deleted the feat
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - feat
+                properties:
+                  id:
+                    type: integer
+                  feat:
+                    $ref: "#/components/schemas/FeatObject"
+        400:
+          description: Bad request if can't find feat
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                  - id
+                properties:
+                  message:
+                    type: string
+                    example: "Cannot find feat with id 5"
+                  id:
+                    type: integer
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /api/new_item:
     post:
       description: Create a new item

@@ -337,3 +337,51 @@ func (*Server) PostApiDeleteItem(ctx context.Context, request api.PostApiDeleteI
 		Item: res,
 	}, nil
 }
+
+func (*Server) PostApiNewFeat(ctx context.Context, request api.PostApiNewFeatRequestObject) (api.PostApiNewFeatResponseObject, error) {
+	temp := &model.InternalFeat{}
+	temp.FeatObject = *request.Body
+	err := model.GetDB().Table("internal_feats").Create(temp).Error
+	if err != nil {
+		return api.PostApiNewFeat500JSONResponse{Message: internalErrorString}, nil
+	}
+	return api.PostApiNewFeat200JSONResponse{
+		Id:   int(temp.ID),
+		Feat: temp.FeatObject,
+	}, nil
+}
+
+func (*Server) GetApiGetAllFeats(ctx context.Context, request api.GetApiGetAllFeatsRequestObject) (api.GetApiGetAllFeatsResponseObject, error) {
+	var results []model.InternalFeat
+	result := model.GetDB().Table("internal_feats").Find(&results)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return api.GetApiGetAllFeats200JSONResponse{}, nil
+		}
+		return api.GetApiGetAllFeats500JSONResponse{Message: internalErrorString}, nil
+	}
+	res := api.GetApiGetAllFeats200JSONResponse{}
+	for _, item := range results {
+		res = append(res, item.FeatObject)
+	}
+	return res, nil
+}
+
+func (*Server) PostApiDeleteFeat(ctx context.Context, request api.PostApiDeleteFeatRequestObject) (api.PostApiDeleteFeatResponseObject, error) {
+	temp := &model.InternalFeat{}
+	err := model.GetDB().Table("internal_feats").Where("id = ?", request.Body.Id).First(temp).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return api.PostApiDeleteFeat400JSONResponse{Message: "Feat not found", Id: request.Body.Id}, nil
+		}
+		return api.PostApiDeleteFeat500JSONResponse{Message: internalErrorString}, nil
+	}
+	err = model.GetDB().Table("internal_feats").Delete(temp).Error
+	if err != nil {
+		return api.PostApiDeleteFeat500JSONResponse{Message: internalErrorString}, nil
+	}
+	return api.PostApiDeleteFeat200JSONResponse{
+		Id:   request.Body.Id,
+		Feat: temp.FeatObject,
+	}, nil
+}
