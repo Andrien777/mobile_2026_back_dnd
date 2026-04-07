@@ -102,6 +102,7 @@ type InternalCharacter struct {
 	WeaponProficiency pq.StringArray `gorm:"type:text[]"`
 	Weight            uint
 	Xp                uint
+	Version           uint
 	Owner             string
 }
 
@@ -144,6 +145,7 @@ func MapInternalCharacterToObject(internal InternalCharacter) (api.CharacterObje
 	if err != nil {
 		return result, err
 	}
+	result.Conditions = internal.Conditions
 	result.DeathSaves = struct {
 		Failure uint `json:"failure"`
 		Success uint `json:"success"`
@@ -232,6 +234,7 @@ func MapInternalCharacterToObject(internal InternalCharacter) (api.CharacterObje
 	result.WeaponProficiency = internal.WeaponProficiency
 	result.Weight = internal.Weight
 	result.Xp = internal.Xp
+	result.Version = internal.Version
 	return result, nil
 }
 
@@ -275,6 +278,7 @@ func MapObjectToInternalCharacter(object api.CharacterObject) (InternalCharacter
 	if err != nil {
 		return result, err
 	}
+	result.Conditions = object.Conditions
 	result.DeathSaves = struct {
 		Failure uint
 		Success uint
@@ -363,5 +367,6 @@ func MapObjectToInternalCharacter(object api.CharacterObject) (InternalCharacter
 	result.WeaponProficiency = object.WeaponProficiency
 	result.Weight = object.Weight
 	result.Xp = object.Xp
+	result.Version = object.Version
 	return result, nil
 }

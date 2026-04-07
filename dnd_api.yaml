@@ -4,7 +4,7 @@ info:
   description: DnD Backend
   version: 1.0.0
 servers:
-  - url: 'http://localhost'
+  - url: '/'
 components:
   securitySchemes:
     JwtBearer:
@@ -286,6 +286,7 @@ components:
       type: object
       required:
         - name
+        - version
         - picture
         - race
         - xp
@@ -343,6 +344,10 @@ components:
         name:
           type: string
           example: "Thorin Ironforge"
+        version:
+          type: integer
+          format: uint
+          example: 1
         picture:
           type: string # url-encoded
         race:
@@ -875,6 +880,70 @@ components:
       properties:
         message:
           type: string
+    CharacterSummaryObject:
+      type: object
+      required:
+        - id
+        - name
+        - picture
+        - race
+        - class
+        - level
+        - is_shared
+        - owner_username
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Character 1"
+        picture:
+          type: string #url-encoded
+        race:
+          type: string
+          example: "Elf"
+        class:
+          type: string
+          example: "Cleric"
+        level:
+          type: integer
+          format: uint
+        is_shared:
+          type: boolean
+        owner_username:
+          type: string
+    ShareCharacterRequest:
+      type: object
+      required:
+        - id
+        - username
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+    UnshareCharacterRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+    UpdateConflictResponse:
+      type: object
+      required:
+        - message
+        - id
+        - character
+      properties:
+        message:
+          type: string
+        id:
+          type: integer
+        character:
+          $ref: "#/components/schemas/CharacterObject"
 
 tags:
   - name: Auth
@@ -1270,31 +1339,79 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  required:
-                    - id
-                    - name
-                    - picture
-                    - race
-                    - class
-                    - level
-                  properties:
-                    id:
-                      type: integer
-                    name:
-                      type: string
-                      example: "Character 1"
-                    picture:
-                      type: string #url-encoded
-                    race:
-                      type: string
-                      example: "Elf"
-                    class:
-                      type: string
-                      example: "Cleric"
-                    level:
-                      type: integer
-                      format: uint
+                  $ref: "#/components/schemas/CharacterSummaryObject"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/share_character:
+    post:
+      description: Share a character with another user by username
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [Characters]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShareCharacterRequest"
+      responses:
+        200:
+          description: Successfully shared character
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShareCharacterRequest"
+        400:
+          description: Bad request if data is invalid or user/character not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        401:
+          description: Unauthorised
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Some error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/unshare_character:
+    post:
+      description: Remove shared access from a user or from current recipient
+      security:
+        - JwtBearer: [ "auth" ]
+      tags: [Characters]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UnshareCharacterRequest"
+      responses:
+        200:
+          description: Successfully removed shared access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnshareCharacterRequest"
+        400:
+          description: Bad request if data is invalid or user/character not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         401:
           description: Unauthorised
           content:
@@ -1447,6 +1564,12 @@ paths:
                     example: "Cannot find character with id 5"
                   id:
                     type: integer
+        409:
+          description: Conflict between client and server versions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateConflictResponse"
         401:
           description: Unauthorised
           content:
