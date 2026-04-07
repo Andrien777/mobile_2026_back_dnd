@@ -720,6 +720,7 @@ type CharacterObject struct {
 		} `json:"slots"`
 	} `json:"spells"`
 	ToolsProficiency  []string `json:"tools_proficiency"`
+	Version           uint     `json:"version"`
 	WeaponProficiency []string `json:"weapon_proficiency"`
 	Weight            uint     `json:"weight"`
 	Xp                uint     `json:"xp"`
@@ -749,6 +750,18 @@ type CharacterObjectSavingThrowProf string
 // CharacterObjectSize defines model for CharacterObject.Size.
 type CharacterObjectSize string
 
+// CharacterSummaryObject defines model for CharacterSummaryObject.
+type CharacterSummaryObject struct {
+	Class         string `json:"class"`
+	Id            int    `json:"id"`
+	IsShared      bool   `json:"is_shared"`
+	Level         uint   `json:"level"`
+	Name          string `json:"name"`
+	OwnerUsername string `json:"owner_username"`
+	Picture       string `json:"picture"`
+	Race          string `json:"race"`
+}
+
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
 	Message string `json:"message"`
@@ -776,6 +789,12 @@ type ItemObjectItemType string
 // RegisteredUserStructure defines model for RegisteredUserStructure.
 type RegisteredUserStructure struct {
 	Token    string `json:"token"`
+	Username string `json:"username"`
+}
+
+// ShareCharacterRequest defines model for ShareCharacterRequest.
+type ShareCharacterRequest struct {
+	Id       int    `json:"id"`
 	Username string `json:"username"`
 }
 
@@ -856,6 +875,19 @@ type SpellObjectUpcastDiceValue int
 // SpellObjectUpcastUpcastType defines model for SpellObject.Upcast.UpcastType.
 type SpellObjectUpcastUpcastType string
 
+// UnshareCharacterRequest defines model for UnshareCharacterRequest.
+type UnshareCharacterRequest struct {
+	Id       int     `json:"id"`
+	Username *string `json:"username,omitempty"`
+}
+
+// UpdateConflictResponse defines model for UpdateConflictResponse.
+type UpdateConflictResponse struct {
+	Character CharacterObject `json:"character"`
+	Id        int             `json:"id"`
+	Message   string          `json:"message"`
+}
+
 // UserStructure defines model for UserStructure.
 type UserStructure struct {
 	Password string `json:"password"`
@@ -923,6 +955,12 @@ type PostApiNewSpellJSONRequestBody = SpellObject
 // PostApiRegisterJSONRequestBody defines body for PostApiRegister for application/json ContentType.
 type PostApiRegisterJSONRequestBody = UserStructure
 
+// PostApiShareCharacterJSONRequestBody defines body for PostApiShareCharacter for application/json ContentType.
+type PostApiShareCharacterJSONRequestBody = ShareCharacterRequest
+
+// PostApiUnshareCharacterJSONRequestBody defines body for PostApiUnshareCharacter for application/json ContentType.
+type PostApiUnshareCharacterJSONRequestBody = UnshareCharacterRequest
+
 // PostApiUpdateCharacterJSONRequestBody defines body for PostApiUpdateCharacter for application/json ContentType.
 type PostApiUpdateCharacterJSONRequestBody PostApiUpdateCharacterJSONBody
 
@@ -973,6 +1011,12 @@ type ServerInterface interface {
 
 	// (POST /api/register)
 	PostApiRegister(w http.ResponseWriter, r *http.Request)
+
+	// (POST /api/share_character)
+	PostApiShareCharacter(w http.ResponseWriter, r *http.Request)
+
+	// (POST /api/unshare_character)
+	PostApiUnshareCharacter(w http.ResponseWriter, r *http.Request)
 
 	// (POST /api/update_character)
 	PostApiUpdateCharacter(w http.ResponseWriter, r *http.Request)
@@ -1054,6 +1098,16 @@ func (_ Unimplemented) PostApiNewSpell(w http.ResponseWriter, r *http.Request) {
 
 // (POST /api/register)
 func (_ Unimplemented) PostApiRegister(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (POST /api/share_character)
+func (_ Unimplemented) PostApiShareCharacter(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (POST /api/unshare_character)
+func (_ Unimplemented) PostApiUnshareCharacter(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1379,6 +1433,46 @@ func (siw *ServerInterfaceWrapper) PostApiRegister(w http.ResponseWriter, r *htt
 	handler.ServeHTTP(w, r)
 }
 
+// PostApiShareCharacter operation middleware
+func (siw *ServerInterfaceWrapper) PostApiShareCharacter(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostApiShareCharacter(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostApiUnshareCharacter operation middleware
+func (siw *ServerInterfaceWrapper) PostApiUnshareCharacter(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, JwtBearerScopes, []string{"auth"})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostApiUnshareCharacter(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // PostApiUpdateCharacter operation middleware
 func (siw *ServerInterfaceWrapper) PostApiUpdateCharacter(w http.ResponseWriter, r *http.Request) {
 
@@ -1556,6 +1650,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/register", wrapper.PostApiRegister)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/share_character", wrapper.PostApiShareCharacter)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/unshare_character", wrapper.PostApiUnshareCharacter)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/update_character", wrapper.PostApiUpdateCharacter)
@@ -1920,14 +2020,7 @@ type GetApiListCharactersResponseObject interface {
 	VisitGetApiListCharactersResponse(w http.ResponseWriter) error
 }
 
-type GetApiListCharacters200JSONResponse []struct {
-	Class   string `json:"class"`
-	Id      int    `json:"id"`
-	Level   uint   `json:"level"`
-	Name    string `json:"name"`
-	Picture string `json:"picture"`
-	Race    string `json:"race"`
-}
+type GetApiListCharacters200JSONResponse []CharacterSummaryObject
 
 func (response GetApiListCharacters200JSONResponse) VisitGetApiListCharactersResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2176,6 +2269,94 @@ func (response PostApiRegister500JSONResponse) VisitPostApiRegisterResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PostApiShareCharacterRequestObject struct {
+	Body *PostApiShareCharacterJSONRequestBody
+}
+
+type PostApiShareCharacterResponseObject interface {
+	VisitPostApiShareCharacterResponse(w http.ResponseWriter) error
+}
+
+type PostApiShareCharacter200JSONResponse ShareCharacterRequest
+
+func (response PostApiShareCharacter200JSONResponse) VisitPostApiShareCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiShareCharacter400JSONResponse ErrorResponse
+
+func (response PostApiShareCharacter400JSONResponse) VisitPostApiShareCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiShareCharacter401JSONResponse ErrorResponse
+
+func (response PostApiShareCharacter401JSONResponse) VisitPostApiShareCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiShareCharacter500JSONResponse ErrorResponse
+
+func (response PostApiShareCharacter500JSONResponse) VisitPostApiShareCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiUnshareCharacterRequestObject struct {
+	Body *PostApiUnshareCharacterJSONRequestBody
+}
+
+type PostApiUnshareCharacterResponseObject interface {
+	VisitPostApiUnshareCharacterResponse(w http.ResponseWriter) error
+}
+
+type PostApiUnshareCharacter200JSONResponse UnshareCharacterRequest
+
+func (response PostApiUnshareCharacter200JSONResponse) VisitPostApiUnshareCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiUnshareCharacter400JSONResponse ErrorResponse
+
+func (response PostApiUnshareCharacter400JSONResponse) VisitPostApiUnshareCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiUnshareCharacter401JSONResponse ErrorResponse
+
+func (response PostApiUnshareCharacter401JSONResponse) VisitPostApiUnshareCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiUnshareCharacter500JSONResponse ErrorResponse
+
+func (response PostApiUnshareCharacter500JSONResponse) VisitPostApiUnshareCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PostApiUpdateCharacterRequestObject struct {
 	Body *PostApiUpdateCharacterJSONRequestBody
 }
@@ -2210,6 +2391,15 @@ type PostApiUpdateCharacter401JSONResponse ErrorResponse
 func (response PostApiUpdateCharacter401JSONResponse) VisitPostApiUpdateCharacterResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostApiUpdateCharacter409JSONResponse UpdateConflictResponse
+
+func (response PostApiUpdateCharacter409JSONResponse) VisitPostApiUpdateCharacterResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(409)
 
 	return json.NewEncoder(w).Encode(response)
 }
@@ -2270,6 +2460,12 @@ type StrictServerInterface interface {
 
 	// (POST /api/register)
 	PostApiRegister(ctx context.Context, request PostApiRegisterRequestObject) (PostApiRegisterResponseObject, error)
+
+	// (POST /api/share_character)
+	PostApiShareCharacter(ctx context.Context, request PostApiShareCharacterRequestObject) (PostApiShareCharacterResponseObject, error)
+
+	// (POST /api/unshare_character)
+	PostApiUnshareCharacter(ctx context.Context, request PostApiUnshareCharacterRequestObject) (PostApiUnshareCharacterResponseObject, error)
 
 	// (POST /api/update_character)
 	PostApiUpdateCharacter(ctx context.Context, request PostApiUpdateCharacterRequestObject) (PostApiUpdateCharacterResponseObject, error)
@@ -2766,6 +2962,74 @@ func (sh *strictHandler) PostApiRegister(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// PostApiShareCharacter operation middleware
+func (sh *strictHandler) PostApiShareCharacter(w http.ResponseWriter, r *http.Request) {
+	var request PostApiShareCharacterRequestObject
+
+	var body PostApiShareCharacterJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		if !errors.Is(err, io.EOF) {
+			sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+			return
+		}
+	} else {
+		request.Body = &body
+	}
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostApiShareCharacter(ctx, request.(PostApiShareCharacterRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostApiShareCharacter")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostApiShareCharacterResponseObject); ok {
+		if err := validResponse.VisitPostApiShareCharacterResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostApiUnshareCharacter operation middleware
+func (sh *strictHandler) PostApiUnshareCharacter(w http.ResponseWriter, r *http.Request) {
+	var request PostApiUnshareCharacterRequestObject
+
+	var body PostApiUnshareCharacterJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		if !errors.Is(err, io.EOF) {
+			sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+			return
+		}
+	} else {
+		request.Body = &body
+	}
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostApiUnshareCharacter(ctx, request.(PostApiUnshareCharacterRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostApiUnshareCharacter")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostApiUnshareCharacterResponseObject); ok {
+		if err := validResponse.VisitPostApiUnshareCharacterResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // PostApiUpdateCharacter operation middleware
 func (sh *strictHandler) PostApiUpdateCharacter(w http.ResponseWriter, r *http.Request) {
 	var request PostApiUpdateCharacterRequestObject
@@ -2803,64 +3067,68 @@ func (sh *strictHandler) PostApiUpdateCharacter(w http.ResponseWriter, r *http.R
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"3wEAAP//m+tWoWlgAAA=",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
